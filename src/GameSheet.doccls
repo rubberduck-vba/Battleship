@@ -1,0 +1,677 @@
+﻿'@Folder("Battleship.View.Worksheet")
+Option Explicit
+
+Private Const InfoBoxMessage As String = _
+    "ENEMY FLEET DETECTED" & vbNewLine & _
+    "ALL SYSTEMS READY" & vbNewLine & vbNewLine & _
+    "DOUBLE CLICK IN THE ENEMY GRID TO FIRE A MISSILE." & vbNewLine & vbNewLine & _
+    "FIND AND DESTROY ALL ENEMY SHIPS BEFORE THEY DESTROY YOUR OWN FLEET!"
+
+Private Const InfoBoxPlaceShips As String = _
+    "FLEET DEPLOYMENT" & vbNewLine & _
+    "ACTION REQUIRED: DEPLOY %SHIP%" & vbNewLine & vbNewLine & _
+    " -CLICK TO PREVIEW" & vbNewLine & _
+    " -RIGHT CLICK TO ROTATE" & vbNewLine & _
+    " -DOUBLE CLICK TO CONFIRM" & vbNewLine & vbNewLine
+    
+Private Const ErrorBoxInvalidPosition As String = _
+    "FLEET DEPLOYMENT" & vbNewLine & _
+    "SYSTEM ERROR" & vbNewLine & vbNewLine & _
+    " -SHIPS CANNOT OVERLAP." & vbNewLine & _
+    " -SHIPS MUST BE ENTIRELY WITHIN THE GRID." & vbNewLine & vbNewLine & _
+    "DEPLOY SHIP TO ANOTHER POSITION."
+    
+Private Const ErrorBoxInvalidKnownAttackPosition As String = _
+    "TARGETING SYSTEM" & vbNewLine & vbNewLine & _
+    "SPECIFIED GRID LOCATION IS ALREADY IN A KNOWN STATE." & vbNewLine & vbNewLine & _
+    "NEW VALID COORDINATES REQUIRED."
+
+Private previousMode As ViewMode
+Private Mode As ViewMode
+
+Public Event CreatePlayer(ByVal gridId As Byte, ByVal pt As PlayerType, ByVal difficulty As AIDifficulty)
+Public Event PlayerReady()
+Public Event SelectionChange(ByVal gridId As Byte, ByVal position As IGridCoord, ByVal Mode As ViewMode)
+Public Event RightClick(ByVal gridId As Byte, ByVal position As IGridCoord, ByVal Mode As ViewMode)
+Public Event DoubleClick(ByVal gridId As Byte, ByVal position As IGridCoord, ByVal Mode As ViewMode)
+
+Public Sub OnNewGame()
+    Application.ScreenUpdating = False
+    Mode = NewGame
+    ClearGrid 1
+    ClearGrid 2
+    LockGrids
+    HideAllShapes
+    ShowShapes HumanPlayerButton(1), _
+               AIPlayerButton(1, RandomAI), _
+               AIPlayerButton(1, FairplayAI), _
+               AIPlayerButton(1, MercilessAI), _
+               HumanPlayerButton(2), _
+               AIPlayerButton(2, RandomAI), _
+               AIPlayerButton(2, FairplayAI), _
+               AIPlayerButton(2, MercilessAI)
+    Me.Activate
+    Application.ScreenUpdating = True
+End Sub
+
+'@Description("Computes an grid position for a given Range in the given grid ID.")
+Public Function RangeToGridCoord(ByVal target As Range, ByRef gridId As Byte) As IGridCoord
+    If target.Count > 1 Then Exit Function
+    For gridId = 1 To 2
+        With PlayerGrid(gridId)
+            If Not Intersect(.Cells, target) Is Nothing Then
+                Set RangeToGridCoord = _
+                    GridCoord.Create(xPosition:=target.Column - .Column + 1, _
+                                     yPosition:=target.Row - .Row + 1)
+                Exit Function
+            End If
+        End With
+    Next
+End Function
+
+'@Description("Computes a Range for the given grid position and grid ID.")
+Public Function GridCoordToRange(ByVal gridId As Byte, ByVal position As IGridCoord) As Range
+    With PlayerGrid(gridId)
+        Set GridCoordToRange = .Cells(position.Y, position.X)
+    End With
+End Function
+
+Private Sub Worksheet_BeforeDoubleClick(ByVal target As Range, ByRef Cancel As Boolean)
+    Cancel = True
+    Dim gridId As Byte
+    Dim position As IGridCoord
+    Set position = RangeToGridCoord(target, gridId)
+    If Mode = FleetPosition Or Mode = player1 And gridId = 2 Or Mode = player2 And gridId = 1 Then
+        RaiseEvent DoubleClick(gridId, position, Mode)
+    End If
+End Sub
+
+Private Sub Worksheet_BeforeRightClick(ByVal target As Range, Cancel As Boolean)
+    Cancel = True
+    If Mode = FleetPosition Then
+        Dim gridId As Byte
+        Dim position As IGridCoord
+        Set position = RangeToGridCoord(target, gridId)
+        RaiseEvent RightClick(gridId, position, Mode)
+    End If
+End Sub
+
+Private Sub Worksheet_SelectionChange(ByVal target As Range)
+    Dim gridId As Byte
+    Dim position As IGridCoord
+    Set position = RangeToGridCoord(target, gridId)
+    If Not position Is Nothing Then
+        Me.Unprotect
+        CurrentSelectionGrid(gridId).Value = position.ToA1String
+        CurrentSelectionGrid(IIf(gridId = 1, 2, 1)).Value = Empty
+        Me.Protect
+        Me.EnableSelection = xlUnlockedCells
+        RaiseEvent SelectionChange(gridId, position, Mode)
+    End If
+End Sub
+
+Public Sub ClearGrid(ByVal gridId As Byte)
+    Me.Unprotect
+    PlayerGrid(gridId).Value = Empty
+    Me.Protect
+    Me.EnableSelection = xlUnlockedCells
+End Sub
+
+Public Sub LockGrids()
+    Me.Unprotect
+    PlayerGrid(1).Locked = True
+    PlayerGrid(2).Locked = True
+    Me.Protect
+    Me.EnableSelection = xlUnlockedCells
+End Sub
+
+Public Sub UnlockGrid(ByVal gridId As Byte)
+    Me.Unprotect
+    PlayerGrid(gridId).Locked = False
+    PlayerGrid(IIf(gridId = 1, 2, 1)).Locked = True
+    Me.Protect
+    Me.EnableSelection = xlUnlockedCells
+End Sub
+
+Public Sub LockGrid(ByVal gridId As Byte)
+    Me.Unprotect
+    PlayerGrid(gridId).Locked = True
+    PlayerGrid(IIf(gridId = 1, 2, 1)).Locked = False
+    Me.Protect
+    Me.EnableSelection = xlUnlockedCells
+End Sub
+
+Private Property Get PlayerGrid(ByVal gridId As Byte) As Range
+    Set PlayerGrid = Me.Names("PlayerGrid" & gridId).RefersToRange
+End Property
+
+Private Property Get CurrentSelectionGrid(ByVal gridId As Byte) As Range
+    Set CurrentSelectionGrid = Me.Names("CurrentSelectionGrid" & gridId).RefersToRange
+End Property
+
+Private Property Get TitleLabel() As Shape
+    Set TitleLabel = Me.Shapes("Title")
+End Property
+
+Private Property Get MissLabel(ByVal gridId As Byte) As Shape
+    Set MissLabel = Me.Shapes("MissLabelGrid" & gridId)
+End Property
+
+Private Property Get HitLabel(ByVal gridId As Byte) As Shape
+    Set HitLabel = Me.Shapes("HitGrid" & gridId)
+End Property
+
+Private Property Get SunkLabel(ByVal gridId As Byte) As Shape
+    Set SunkLabel = Me.Shapes("SunkGrid" & gridId)
+End Property
+
+Private Property Get GameOverWinLabel(ByVal gridId As Byte) As Shape
+    Set GameOverWinLabel = Me.Shapes("GameOverWinGrid" & gridId)
+End Property
+
+Private Property Get GameOverLoseLabel(ByVal gridId As Byte) As Shape
+    Set GameOverLoseLabel = Me.Shapes("GameOverLoseGrid" & gridId)
+End Property
+
+Private Property Get InformationBox() As Shape
+    Set InformationBox = Me.Shapes("InformationBox")
+End Property
+
+Private Property Get ErrorBox() As Shape
+    Set ErrorBox = Me.Shapes("ErrorBox")
+End Property
+
+Private Property Get FleetStatusBox() As Shape
+    Set FleetStatusBox = Me.Shapes("FleetStatusBox")
+End Property
+
+Private Property Get AcquiredTargetsBox(ByVal gridId As Byte) As Shape
+    Set AcquiredTargetsBox = Me.Shapes("Grid" & gridId & "TargetsBox")
+End Property
+
+Private Property Get AcquiredTargetShip(ByVal gridId As Byte, ByVal shipName As String) As Shape
+    Set AcquiredTargetShip = Me.Shapes("Grid" & gridId & "Target_" & VBA.Strings.Replace(shipName, " ", vbNullString))
+End Property
+
+Private Property Get ShipHitMarker(ByVal shipName As String, ByVal index As Byte) As Shape
+    Set ShipHitMarker = Me.Shapes(VBA.Strings.Replace(shipName, " ", vbNullString) & "_Hit" & index)
+End Property
+
+Private Property Get SunkTargetMarker(ByVal gridId As Byte, ByVal shipName As String) As Shape
+    Set SunkTargetMarker = Me.Shapes("Grid" & gridId & "TargetSunk_" & VBA.Strings.Replace(shipName, " ", vbNullString))
+End Property
+
+Private Property Get HumanPlayerButton(ByVal gridId As Byte) As Shape
+    Set HumanPlayerButton = Me.Shapes("HumanPlayer" & gridId)
+End Property
+
+Private Property Get AIPlayerButton(ByVal gridId As Byte, ByVal difficulty As AIDifficulty) As Shape
+    Select Case difficulty
+        Case AIDifficulty.RandomAI
+            Set AIPlayerButton = Me.Shapes("RandomAIPlayer" & gridId)
+        Case AIDifficulty.FairplayAI
+            Set AIPlayerButton = Me.Shapes("FairPlayAIPlayer" & gridId)
+        Case AIDifficulty.MercilessAI
+            Set AIPlayerButton = Me.Shapes("MercilessAIPlayer" & gridId)
+    End Select
+End Property
+
+Private Sub HidePlayerButtons(Optional ByVal gridId As Byte)
+    If gridId = 0 Then
+        For gridId = 1 To 2
+            HideShapes HumanPlayerButton(gridId), _
+                       AIPlayerButton(gridId, RandomAI), _
+                       AIPlayerButton(gridId, FairplayAI), _
+                       AIPlayerButton(gridId, MercilessAI)
+        Next
+    Else
+        HideShapes HumanPlayerButton(gridId), _
+                   AIPlayerButton(gridId, RandomAI), _
+                   AIPlayerButton(gridId, FairplayAI), _
+                   AIPlayerButton(gridId, MercilessAI)
+    End If
+End Sub
+
+Public Sub OnHumanPlayer1()
+    HidePlayerButtons 1
+    HideShapes HumanPlayerButton(2)
+    RaiseEvent CreatePlayer(1, HumanControlled, Unspecified)
+End Sub
+
+Public Sub OnHumanPlayer2()
+    HidePlayerButtons 2
+    HideShapes HumanPlayerButton(1)
+    RaiseEvent CreatePlayer(2, HumanControlled, Unspecified)
+End Sub
+
+Public Sub OnRandomAIPlayer1()
+    HidePlayerButtons 1
+    RaiseEvent CreatePlayer(1, ComputerControlled, RandomAI)
+End Sub
+
+Public Sub OnRandomAIPlayer2()
+    HidePlayerButtons 2
+    RaiseEvent CreatePlayer(2, ComputerControlled, RandomAI)
+End Sub
+
+Public Sub OnFairPlayAIPlayer1()
+    HidePlayerButtons 1
+    RaiseEvent CreatePlayer(1, ComputerControlled, FairplayAI)
+End Sub
+
+Public Sub OnFairPlayAIPlayer2()
+    HidePlayerButtons 2
+    RaiseEvent CreatePlayer(2, ComputerControlled, FairplayAI)
+End Sub
+
+Public Sub OnMercilessAIPlayer1()
+    HidePlayerButtons 1
+    RaiseEvent CreatePlayer(1, ComputerControlled, MercilessAI)
+End Sub
+
+Public Sub OnMercilessAIPlayer2()
+    HidePlayerButtons 2
+    RaiseEvent CreatePlayer(2, ComputerControlled, MercilessAI)
+End Sub
+
+Public Sub HideInformationBox()
+    InformationBox.Visible = msoFalse
+    Mode = previousMode
+    If Mode = player1 Then
+        UnlockGrid 2
+    ElseIf Mode = player2 Then
+        UnlockGrid 1
+    End If
+    Me.Protect
+    Me.EnableSelection = xlUnlockedCells
+    If Mode = player1 Or Mode = player2 Then RaiseEvent PlayerReady
+End Sub
+
+Public Sub HideErrorBox()
+    ErrorBox.Visible = msoFalse
+    Mode = previousMode
+    Me.Protect
+    Me.EnableSelection = xlUnlockedCells
+End Sub
+
+Public Sub ShowInfoBeginDeployShip(ByVal shipName As String)
+    Mode = FleetPosition
+    ShowFleetStatus
+    ShowInformation Replace(InfoBoxPlaceShips, "%SHIP%", UCase$(shipName))
+End Sub
+
+Public Sub ShowInfoBeginAttackPhase(ByVal currentPlayerGridId As Byte)
+    Mode = IIf(currentPlayerGridId = 1, player1, player2)
+    ShowInformation InfoBoxMessage
+End Sub
+
+Public Sub ShowErrorInvalidShipPosition()
+    ShowError ErrorBoxInvalidPosition
+End Sub
+
+Public Sub ShowErrorKnownPositionAttack()
+    ShowError ErrorBoxInvalidKnownAttackPosition
+End Sub
+
+Public Sub RefreshGrid(ByVal grid As PlayerGrid)
+    Application.ScreenUpdating = False
+    Me.Unprotect
+    PlayerGrid(grid.gridId).Value = Application.WorksheetFunction.Transpose(grid.StateArray)
+    Me.Protect
+    Me.EnableSelection = xlUnlockedCells
+    Application.ScreenUpdating = True
+End Sub
+
+Private Sub ShowInformation(ByVal message As String)
+    Me.Unprotect
+    With InformationBox
+        
+        With .GroupItems("InformationBoxBackground")
+            With .TextFrame
+                .Characters.Delete
+                .Characters.Text = vbNewLine & message
+                .VerticalAlignment = xlVAlignTop
+                .VerticalOverflow = xlOartVerticalOverflowEllipsis
+                .HorizontalAlignment = xlHAlignLeft
+            End With
+        End With
+        
+        .Visible = msoTrue
+    End With
+    previousMode = Mode
+    Mode = MessageShown
+    Me.Protect
+    Me.EnableSelection = xlNoSelection
+End Sub
+
+Public Sub ShowError(ByVal message As String)
+    Me.Unprotect
+    With ErrorBox
+        
+        With .GroupItems("ErrorBoxBackground")
+            With .TextFrame
+                .Characters.Delete
+                .Characters.Text = vbNewLine & message
+                .VerticalAlignment = xlVAlignTop
+                .VerticalOverflow = xlOartVerticalOverflowEllipsis
+                .HorizontalAlignment = xlHAlignLeft
+            End With
+        End With
+        
+        .Visible = msoTrue
+    End With
+    previousMode = Mode
+    Mode = MessageShown
+    Me.Protect
+    Me.EnableSelection = xlNoSelection
+End Sub
+
+Public Sub HideAllShapes()
+    Me.Unprotect
+    Application.ScreenUpdating = False
+    HideFleetStatus
+    HideAcquiredTargetBoxes
+    HideShapes InformationBox, ErrorBox
+    HideShipStatus "Aircraft Carrier"
+    HideShipStatus "Battleship"
+    HideShipStatus "Submarine"
+    HideShipStatus "Cruiser"
+    HideShipStatus "Destroyer"
+    HideShapes ShipHitMarker("Aircraft Carrier", 1), _
+               ShipHitMarker("Aircraft Carrier", 2), _
+               ShipHitMarker("Aircraft Carrier", 3), _
+               ShipHitMarker("Aircraft Carrier", 4), _
+               ShipHitMarker("Aircraft Carrier", 5)
+    HideShapes ShipHitMarker("Battleship", 1), _
+               ShipHitMarker("Battleship", 2), _
+               ShipHitMarker("Battleship", 3), _
+               ShipHitMarker("Battleship", 4)
+    HideShapes ShipHitMarker("Submarine", 1), _
+               ShipHitMarker("Submarine", 2), _
+               ShipHitMarker("Submarine", 3)
+    HideShapes ShipHitMarker("Cruiser", 1), _
+               ShipHitMarker("Cruiser", 2), _
+               ShipHitMarker("Cruiser", 3)
+    HideShapes ShipHitMarker("Destroyer", 1), _
+               ShipHitMarker("Destroyer", 2)
+    Dim grid As Byte
+    For grid = 1 To 2
+        HideShapes HitLabel(grid), _
+                   SunkLabel(grid), _
+                   MissLabel(grid), _
+                   MissLabel(grid), _
+                   HumanPlayerButton(grid), _
+                   AIPlayerButton(grid, RandomAI), _
+                   AIPlayerButton(grid, FairplayAI), _
+                   AIPlayerButton(grid, MercilessAI), _
+                   GameOverWinLabel(grid), _
+                   GameOverLoseLabel(grid), _
+                   AcquiredTargetsBox(grid)
+    Next
+    Application.ScreenUpdating = True
+    Me.Protect
+End Sub
+
+Public Sub ShowAllShapes()
+'for debugging
+    Application.ScreenUpdating = False
+    ShowFleetStatus
+    ShowAcquiredTargetBoxes
+    ShowShapes InformationBox, ErrorBox
+    ShowShipStatus "Aircraft Carrier"
+    ShowShipStatus "Battleship"
+    ShowShipStatus "Submarine"
+    ShowShipStatus "Cruiser"
+    ShowShipStatus "Destroyer"
+    ShowShapes ShipHitMarker("Aircraft Carrier", 1), _
+               ShipHitMarker("Aircraft Carrier", 2), _
+               ShipHitMarker("Aircraft Carrier", 3), _
+               ShipHitMarker("Aircraft Carrier", 4), _
+               ShipHitMarker("Aircraft Carrier", 5)
+    ShowShapes ShipHitMarker("Battleship", 1), _
+               ShipHitMarker("Battleship", 2), _
+               ShipHitMarker("Battleship", 3), _
+               ShipHitMarker("Battleship", 4)
+    ShowShapes ShipHitMarker("Submarine", 1), _
+               ShipHitMarker("Submarine", 2), _
+               ShipHitMarker("Submarine", 3)
+    ShowShapes ShipHitMarker("Cruiser", 1), _
+               ShipHitMarker("Cruiser", 2), _
+               ShipHitMarker("Cruiser", 3)
+    ShowShapes ShipHitMarker("Destroyer", 1), _
+               ShipHitMarker("Destroyer", 2)
+    Dim grid As Byte
+    For grid = 1 To 2
+        ShowShapes HitLabel(grid), _
+                   SunkLabel(grid), _
+                   MissLabel(grid), _
+                   MissLabel(grid), _
+                   HumanPlayerButton(grid), _
+                   AIPlayerButton(grid, RandomAI), _
+                   AIPlayerButton(grid, FairplayAI), _
+                   AIPlayerButton(grid, MercilessAI), _
+                   GameOverWinLabel(grid), _
+                   GameOverLoseLabel(grid), _
+                   AcquiredTargetsBox(grid)
+
+    Next
+    Application.ScreenUpdating = True
+End Sub
+
+Private Sub HideFleetStatus()
+    
+    HideShapes FleetStatusBox
+    
+    Dim shipFleet As Dictionary
+    Set shipFleet = Ship.Fleet
+    
+    Dim Names As Variant
+    Names = shipFleet.Keys
+    
+    Dim sizes As Variant
+    sizes = shipFleet.Items
+    
+    Dim currentName As Byte
+    For currentName = LBound(Names) To UBound(Names)
+        HideShipStatus Names(currentName)
+        Dim position As Byte
+        For position = 1 To sizes(currentName)
+            HideShapes ShipHitMarker(Names(currentName), position)
+        Next
+    Next
+    
+End Sub
+
+Private Sub HideAcquiredTargetBoxes()
+
+    Dim shipFleet As Dictionary
+    Set shipFleet = Ship.Fleet
+
+    Dim Names As Variant
+    Names = shipFleet.Keys
+
+    Dim gridId As Byte
+    For gridId = 1 To 2
+        AcquiredTargetsBox(gridId).Visible = msoFalse
+        Dim currentName As Byte
+        For currentName = LBound(Names) To UBound(Names)
+            AcquiredTargetShip(gridId, Names(currentName)).Visible = msoFalse
+            SunkTargetMarker(gridId, Names(currentName)).Visible = msoFalse
+        Next
+    Next
+    
+End Sub
+
+Private Sub ShowAcquiredTargetBoxes()
+
+    Dim shipFleet As Dictionary
+    Set shipFleet = Ship.Fleet
+
+    Dim Names As Variant
+    Names = shipFleet.Keys
+
+    Dim gridId As Byte
+    For gridId = 1 To 2
+        AcquiredTargetsBox(gridId).Visible = msoTrue
+        Dim currentName As Byte
+        For currentName = LBound(Names) To UBound(Names)
+            AcquiredTargetShip(gridId, Names(currentName)).Visible = msoTrue
+            SunkTargetMarker(gridId, Names(currentName)).Visible = msoTrue
+        Next
+    Next
+    
+End Sub
+
+Public Sub ShowAcquiredTarget(ByVal gridId As Byte, ByVal shipName As String, Optional ByVal sunken As Boolean = False)
+    AcquiredTargetsBox(gridId).Visible = msoTrue
+    AcquiredTargetShip(gridId, shipName).Visible = msoTrue
+    SunkTargetMarker(gridId, shipName).Visible = IIf(sunken, msoTrue, msoFalse)
+End Sub
+
+Private Sub ShowFleetStatus()
+    FleetStatusBox.Visible = msoTrue
+End Sub
+
+Private Sub HideShipStatus(ByVal shipName As String)
+    Me.Shapes("FleetStatus_" & VBA.Strings.Replace(shipName, " ", vbNullString)).Visible = msoFalse
+End Sub
+
+Private Sub ShowShipStatus(ByVal shipName As String)
+    Me.Shapes("FleetStatus_" & VBA.Strings.Replace(shipName, " ", vbNullString)).Visible = msoTrue
+End Sub
+
+Public Sub UpdateShipStatus(ByVal player As IPlayer, ByVal hitShip As IShip)
+
+    Dim positions As Variant
+    positions = hitShip.StateArray
+    
+    Dim currentPosition As Byte, currentMarker As Byte
+    
+    For currentPosition = LBound(positions) To UBound(positions)
+        currentMarker = currentMarker + 1
+        If positions(currentPosition) Then
+            If player.PlayerType = HumanControlled Then
+                ShipHitMarker(hitShip.Name, currentMarker).Visible = msoTrue
+            Else
+                'AI player targets not visible in Human vs AI game, by design
+            End If
+        End If
+    Next
+    
+End Sub
+
+Public Sub ShowAnimationMiss(ByVal gridId As Byte)
+    With GameRandomizer
+        FlashShape MissLabel(gridId), IIf(.NextSingle < 0.75, 1, IIf(.NextSingle < 0.75, 2, 3)), 10
+    End With
+End Sub
+
+Public Sub ShowAnimationHit(ByVal gridId As Byte)
+    With GameRandomizer
+        FlashShape HitLabel(gridId), IIf(.NextSingle < 0.75, 1, IIf(.NextSingle < 0.75, 2, 3))
+    End With
+End Sub
+
+Public Sub ShowAnimationSunk(ByVal gridId As Byte)
+    With GameRandomizer
+        FlashShape SunkLabel(gridId), IIf(.NextSingle < 0.75, 2, 4), 12
+    End With
+End Sub
+
+Public Sub ShowAnimationVictory(ByVal gridId As Byte)
+    GameOverWinLabel(gridId).Visible = msoTrue
+    Mode = GameOver
+End Sub
+
+Public Sub ShowAnimationDefeat(ByVal gridId As Byte)
+    FlashShape GameOverLoseLabel(gridId), 4
+    GameOverLoseLabel(gridId).Visible = msoTrue
+    Mode = GameOver
+End Sub
+
+Public Sub PreviewShipPosition(ByVal player As IPlayer, ByVal newShip As IShip)
+    RefreshGrid player.PlayGrid
+    Me.Unprotect
+    With PlayerGrid(player.PlayGrid.gridId) _
+        .Cells(1, 1) _
+        .Offset(newShip.GridPosition.Y - 1, newShip.GridPosition.X - 1) _
+        .Resize(RowSize:=IIf(newShip.Orientation = Vertical, newShip.Size, 1), _
+                ColumnSize:=IIf(newShip.Orientation = Horizontal, newShip.Size, 1))
+        
+        .Value = GridState.PreviewShipPosition
+        
+    End With
+    
+    Dim intersecting As GridCoord
+    Set intersecting = player.PlayGrid.IntersectsAny(newShip.GridPosition, newShip.Orientation, newShip.Size)
+    If Not intersecting Is Nothing Then
+        PlayerGrid(player.PlayGrid.gridId).Cells(intersecting.Y, intersecting.X).Value = GridState.InvalidPosition
+    End If
+    Me.Protect
+    Me.EnableSelection = xlUnlockedCells
+End Sub
+
+Public Sub ConfirmShipPosition(ByVal player As IPlayer, ByVal newShip As IShip)
+    ShowShipStatus newShip.Name
+    RefreshGrid player.PlayGrid
+End Sub
+
+Public Sub ShowShapes(ParamArray objects() As Variant)
+    Win32API.ScreenUpdate False
+    Dim i As Long, current As Shape
+    For i = LBound(objects) To UBound(objects)
+        Set current = objects(i)
+        current.Visible = msoTrue
+    Next
+    Win32API.ScreenUpdate True
+End Sub
+
+Public Sub HideShapes(ParamArray objects() As Variant)
+    Win32API.ScreenUpdate False
+    Dim i As Long, current As Shape
+    For i = LBound(objects) To UBound(objects)
+        Set current = objects(i)
+        current.Visible = msoFalse
+    Next
+    Win32API.ScreenUpdate True
+End Sub
+
+Private Sub FlashShape(ByVal target As Shape, ByVal flashes As Long, Optional ByVal Delay As Long = 8)
+    
+    Me.Unprotect
+    target.Rotation = -10 + (GameRandomizer.NextSingle * 20)
+    'Target.Top = Target.Top - 10 + (random.NextSingle * 20)
+    'Target.Left = Target.Left - 10 + (random.NextSingle * 20)
+    
+    ShowShapes target
+    Sleep Delay * 10
+    
+    Dim i As Long
+    For i = 0 To flashes - 1
+        
+        ShowShapes target
+        Sleep Delay * 1.5
+        
+        HideShapes target
+        Sleep Delay * 0.75
+        
+    Next
+    
+    ShowShapes target
+    Sleep Delay * 20
+    
+    HideShapes target
+    Me.Protect
+    
+End Sub
+
+
+
+
+
+
+
+
+
+
+

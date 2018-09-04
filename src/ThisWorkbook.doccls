@@ -1,0 +1,18 @@
+﻿'@Folder("Excel Objects")
+'@Description("Interaction logic for the Battleship.ThisWorkbook workbook module.")
+Option Explicit
+
+Private Sub Workbook_BeforeClose(Cancel As Boolean)
+    TitleSheet.ShowMacrosDisabledWarning
+    TitleSheet.Visible = xlSheetVisible
+    GameSheet.Visible = xlSheetHidden
+End Sub
+
+Private Sub Workbook_Open()
+    Application.ScreenUpdating = False
+    GameSheet.Visible = xlSheetHidden
+    TitleSheet.HideMacrosDisabledWarning
+    TitleSheet.Visible = xlSheetVisible
+    TitleSheet.Activate
+    Application.ScreenUpdating = True
+End Sub
