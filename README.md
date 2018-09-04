@@ -1,9 +1,11 @@
 # Battleship
-A fully OOP, Model-View-Presenter implementation of the classic [Battleship](https://en.wikipedia.org/wiki/Battleship_game) board game, running hosted in Excel, written in VBA to demonstrate the language's little-known OOP capabilities.
+A fully OOP, Model-View-Controller (MVC) architecture implementation of the classic [Battleship](https://en.wikipedia.org/wiki/Battleship_game) board game, running hosted in Excel, written in VBA to demonstrate the language's little-known OOP capabilities.
 
 ## What is this?
 
 Something to play with and have fun with, something to learn with, something to share, something to enhance and extend for fun, because we can, because VBA is fully capable of doing this, and because VBA devs can do open-source on GitHub, too!
+
+For Rubberduck contributors that know C# but don't do any VBA, this makes a decent-sized project to integration-test Rubberduck with. For VBA programmers, it makes a project to study and play with, to see how VBA can be used to write object-oriented code, and how MVC architecture can be leveraged to implement complex but very organized, extensible applications.
 
 ## Do I need [Rubberduck](https://github.com/rubberduck-vba/Rubberduck) to use this code?
 
