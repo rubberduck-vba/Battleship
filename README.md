@@ -1,5 +1,5 @@
 # Battleship
-A fully OOP, Model-View-Presenter implementation, 100% VBA
+A fully OOP, Model-View-Presenter implementation of the classic Battleship](https://en.wikipedia.org/wiki/Battleship_game) board game, running hosted in Excel, written in VBA.
 
 ## What is this?
 
