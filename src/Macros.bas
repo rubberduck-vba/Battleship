@@ -26,7 +26,6 @@ Public Sub PlayOtherInterface()
         
     If MsgBox(message, vbInformation + vbYesNo, "Battleship") = vbYes Then
         Stop
-        ' See [ReadMe] sheet for documentation.
         ' ~> Didn't mean to stop here?
         ' ~> Press F5 and close this window.
         ' ~> Nobody will know ;)

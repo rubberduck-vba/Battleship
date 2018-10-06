@@ -8,7 +8,7 @@ Attribute VB_Creatable = False
 Attribute VB_PredeclaredId = True
 Attribute VB_Exposed = False
 '@Folder("Battleship.AI")
-' dumbest possible AI game strategy: randomly places ships, randomly shoots
+'@Description("A strategy that deploys ships in the first legal random position found, and shoots at random until all enemy ships are found.")
 Option Explicit
 Implements IGameStrategy
 
@@ -34,8 +34,8 @@ Public Property Get Random() As IRandomizer
     Set Random = this.Random
 End Property
 
-Public Property Set Random(ByVal Value As IRandomizer)
-    Set this.Random = Value
+Public Property Set Random(ByVal value As IRandomizer)
+    Set this.Random = value
 End Property
 
 Private Sub Class_Initialize()

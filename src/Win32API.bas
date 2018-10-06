@@ -43,8 +43,8 @@ Private Const EM_SETEVENTMASK = (WM_USER + 69)
 #End If
 
 Public Property Get GUIDSIZE() As Long
-    Dim Value As GUID
-    GUIDSIZE = LenB(Value)
+    Dim value As GUID
+    GUIDSIZE = LenB(value)
 End Property
 
 Public Sub ScreenUpdate(ByVal bState As Boolean)

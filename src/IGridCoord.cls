@@ -8,7 +8,7 @@ Attribute VB_Creatable = False
 Attribute VB_PredeclaredId = False
 Attribute VB_Exposed = True
 Attribute VB_Description = "Describes a coordinate in a 2D grid."
-'@Folder("Battleship.Model")
+'@Folder("Battleship.Model.Grid")
 '@Description("Describes a coordinate in a 2D grid.")
 '@Interface
 Option Explicit

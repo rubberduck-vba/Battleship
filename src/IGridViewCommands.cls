@@ -18,7 +18,7 @@ Public Property Get Events() As IGridViewEvents
 Attribute Events.VB_Description = "Gets/sets a weak refererence to the view events."
 End Property
 
-Public Property Set Events(ByVal Value As IGridViewEvents)
+Public Property Set Events(ByVal value As IGridViewEvents)
 End Property
 
 '@Description("Instructs the view to report to a miss in the specified grid.")

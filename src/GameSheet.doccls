@@ -102,8 +102,8 @@ Private Sub Worksheet_SelectionChange(ByVal target As Range)
     Set position = RangeToGridCoord(target, gridId)
     If Not position Is Nothing Then
         Me.Unprotect
-        CurrentSelectionGrid(gridId).Value = position.ToA1String
-        CurrentSelectionGrid(IIf(gridId = 1, 2, 1)).Value = Empty
+        CurrentSelectionGrid(gridId).value = position.ToA1String
+        CurrentSelectionGrid(IIf(gridId = 1, 2, 1)).value = Empty
         Me.Protect
         Me.EnableSelection = xlUnlockedCells
         RaiseEvent SelectionChange(gridId, position, Mode)
@@ -112,7 +112,7 @@ End Sub
 
 Public Sub ClearGrid(ByVal gridId As Byte)
     Me.Unprotect
-    PlayerGrid(gridId).Value = Empty
+    PlayerGrid(gridId).value = Empty
     Me.Protect
     Me.EnableSelection = xlUnlockedCells
 End Sub
@@ -171,6 +171,10 @@ End Property
 
 Private Property Get GameOverLoseLabel(ByVal gridId As Byte) As Shape
     Set GameOverLoseLabel = Me.Shapes("GameOverLoseGrid" & gridId)
+End Property
+
+Private Property Get ReplayButton() As Shape
+    Set ReplayButton = Me.Shapes("ReplayButton")
 End Property
 
 Private Property Get InformationBox() As Shape
@@ -316,7 +320,7 @@ End Sub
 Public Sub RefreshGrid(ByVal grid As PlayerGrid)
     Application.ScreenUpdating = False
     Me.Unprotect
-    PlayerGrid(grid.gridId).Value = Application.WorksheetFunction.Transpose(grid.StateArray)
+    PlayerGrid(grid.gridId).value = Application.WorksheetFunction.Transpose(grid.StateArray)
     Me.Protect
     Me.EnableSelection = xlUnlockedCells
     Application.ScreenUpdating = True
@@ -371,7 +375,7 @@ Public Sub HideAllShapes()
     Application.ScreenUpdating = False
     HideFleetStatus
     HideAcquiredTargetBoxes
-    HideShapes InformationBox, ErrorBox
+    HideShapes ReplayButton, InformationBox, ErrorBox
     HideShipStatus "Aircraft Carrier"
     HideShipStatus "Battleship"
     HideShipStatus "Submarine"
@@ -589,6 +593,10 @@ Public Sub ShowAnimationDefeat(ByVal gridId As Byte)
     Mode = GameOver
 End Sub
 
+Public Sub ShowReplayButton()
+    ReplayButton.Visible = msoTrue
+End Sub
+
 Public Sub PreviewShipPosition(ByVal player As IPlayer, ByVal newShip As IShip)
     RefreshGrid player.PlayGrid
     Me.Unprotect
@@ -598,14 +606,14 @@ Public Sub PreviewShipPosition(ByVal player As IPlayer, ByVal newShip As IShip)
         .Resize(RowSize:=IIf(newShip.Orientation = Vertical, newShip.Size, 1), _
                 ColumnSize:=IIf(newShip.Orientation = Horizontal, newShip.Size, 1))
         
-        .Value = GridState.PreviewShipPosition
+        .value = GridState.PreviewShipPosition
         
     End With
     
     Dim intersecting As GridCoord
     Set intersecting = player.PlayGrid.IntersectsAny(newShip.GridPosition, newShip.Orientation, newShip.Size)
     If Not intersecting Is Nothing Then
-        PlayerGrid(player.PlayGrid.gridId).Cells(intersecting.Y, intersecting.X).Value = GridState.InvalidPosition
+        PlayerGrid(player.PlayGrid.gridId).Cells(intersecting.Y, intersecting.X).value = GridState.InvalidPosition
     End If
     Me.Protect
     Me.EnableSelection = xlUnlockedCells

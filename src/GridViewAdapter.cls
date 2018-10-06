@@ -62,10 +62,14 @@ Public Property Get GridView() As IGridViewCommands
     Set GridView = this.GridView
 End Property
 
-Public Property Set GridView(ByVal Value As IGridViewCommands)
-    Set this.GridView = Value
+Public Property Set GridView(ByVal value As IGridViewCommands)
+    Set this.GridView = value
 End Property
 
+
+Private Sub Class_Terminate()
+    Debug.Print TypeName(Me) & " is terminating"
+End Sub
 
 ':IGridViewEvents
 ':Messages sent from the view
@@ -100,7 +104,7 @@ End Sub
 ':Messages sent from the controller
 ':*********************************
 
-Private Property Set IGridViewCommands_Events(ByVal Value As IGridViewEvents)
+Private Property Set IGridViewCommands_Events(ByVal value As IGridViewEvents)
     Err.Raise 5, TypeName(Me), "Invalid use of property"
 End Property
 

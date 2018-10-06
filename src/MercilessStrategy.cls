@@ -8,6 +8,7 @@ Attribute VB_Creatable = False
 Attribute VB_PredeclaredId = True
 Attribute VB_Exposed = False
 '@Folder("Battleship.AI")
+'@Description("A strategy that deploys ships more carefully, and attacks in patterns.")
 Option Explicit
 Implements IGameStrategy
 
@@ -40,8 +41,8 @@ Public Property Get Random() As IRandomizer
     Set Random = this.Random
 End Property
 
-Public Property Set Random(ByVal Value As IRandomizer)
-    Set this.Random = Value
+Public Property Set Random(ByVal value As IRandomizer)
+    Set this.Random = value
 End Property
 
 Private Sub Class_Initialize()
@@ -53,7 +54,7 @@ Private Sub IGameStrategy_PlaceShip(ByVal grid As PlayerGrid, ByVal currentShip 
         Dim direction As ShipOrientation
         Dim position As IGridCoord
         Set position = base.PlaceShip(Random, grid, currentShip, direction)
-    Loop Until Not grid.HasAdjacentShip(position, direction, currentShip.Size)
+    Loop Until Not grid.HasAdjacentShip(position, direction, currentShip.Size) Or Random.Maybe(AlmostNever)
     
     grid.AddShip Ship.Create(currentShip.ShipKind, direction, position)
     If grid.shipCount = PlayerGrid.ShipsPerGrid Then grid.Scramble
@@ -67,13 +68,17 @@ Private Function IGameStrategy_Play(ByVal enemyGrid As PlayerGrid) As IGridCoord
         
         If Not area Is Nothing Then
             Set position = base.DestroyTarget(Random, enemyGrid, area)
+        
         Else
-            If this.Random.NextSingle < 0.1 Then
+            If this.Random.Maybe(AlmostNever) Then
                 Set position = base.ShootRandomPosition(this.Random, enemyGrid)
-            ElseIf this.Random.NextSingle < 0.6 Then
+                
+            ElseIf this.Random.Maybe(Sometimes) Then
                 Set position = ScanCenter(enemyGrid)
+            
             Else
                 Set position = ScanEdges(enemyGrid)
+            
             End If
         End If
         
@@ -96,7 +101,7 @@ Private Function ScanCenter(ByVal enemyGrid As PlayerGrid) As IGridCoord
                     'legal, but smallest ship wouldn't fit there. start over.
                     Set lastPosition = Nothing
                 Else
-                    Set position = lastPosition.Offset(IIf(this.Random.NextSingle < 0.5, 1, -1), IIf(this.Random.NextSingle < 0.5, 1, -1))
+                    Set position = lastPosition.Offset(IIf(this.Random.Maybe(Sometimes), 1, -1), IIf(this.Random.Maybe(Sometimes), 1, -1))
                     If position.X < 3 Or position.X > 8 Or position.Y < 3 Or position.Y > 8 Then
                         Set lastPosition = GridCoord.Create(this.Random.Between(3, 8), this.Random.Between(3, 8))
                     End If
@@ -115,15 +120,15 @@ Private Function ScanEdges(ByVal enemyGrid As PlayerGrid) As IGridCoord
     Dim position As IGridCoord
     Dim iterations As Long
     
-    Static lastPosition As IGridCoord
     Static lastEdge As GridEdge
+    Static lastPosition As IGridCoord
     
     Do
         If iterations < 10 Then
             If lastPosition Is Nothing Then
-                If this.Random.NextSingle < 0.5 Then
+                If this.Random.Maybe(Sometimes) Then
                     'scan vertical edge
-                    If this.Random.NextSingle < 0.5 Then
+                    If this.Random.Maybe(Sometimes) Then
                         lastEdge = LeftEdge
                         Set position = GridCoord.Create(this.Random.Between(1, 2), this.Random.Between(1, 10))
                     Else
@@ -132,7 +137,7 @@ Private Function ScanEdges(ByVal enemyGrid As PlayerGrid) As IGridCoord
                     End If
                 Else
                     'scan horizontal edge
-                    If this.Random.NextSingle < 0.5 Then
+                    If this.Random.Maybe(Sometimes) Then
                         lastEdge = TopEdge
                         Set position = GridCoord.Create(this.Random.Between(1, 10), this.Random.Between(1, 2))
                     Else
@@ -146,7 +151,9 @@ Private Function ScanEdges(ByVal enemyGrid As PlayerGrid) As IGridCoord
                     'legal, but smallest ship wouldn't fit there. start over.
                     Set lastPosition = Nothing
                 Else
-                    If this.Random.NextSingle < 0.25 Then lastEdge = this.Random.Between(0, 3)
+                    'allow suddenly jumping to another edge
+                    If this.Random.Maybe(Rarely) Then lastEdge = this.Random.Between(0, 3)
+                    
                     Select Case lastEdge
                         Case LeftEdge
                             Set position = GridCoord.Create(IIf(lastPosition.X = 1, 2, 1), IIf(lastPosition.Y + 1 > 10, 1, lastPosition.Y + 1))
@@ -155,7 +162,7 @@ Private Function ScanEdges(ByVal enemyGrid As PlayerGrid) As IGridCoord
                         Case TopEdge
                             Set position = GridCoord.Create(IIf(lastPosition.X + 1 > 10, 1, lastPosition.X + 1), IIf(lastPosition.Y = 1, 2, 1))
                         Case BottomEdge
-                            Set position = GridCoord.Create(IIf(lastPosition.X - 1 < 1, 10, lastPosition.X - 1), IIf(lastPosition.Y = 10, 9, 10))
+                           Set position = GridCoord.Create(IIf(lastPosition.X - 1 < 1, 10, lastPosition.X - 1), IIf(lastPosition.Y = 10, 9, 10))
                     End Select
                 End If
             End If
@@ -175,8 +182,7 @@ Private Function AvoidAdjacentHitPosition(ByVal enemyGrid As PlayerGrid, ByVal p
     If Not enemyGrid.HasDamagedShip(position) Then
     'if there's a damaged ship (hit but not sunken) at that position, let it be allowed.
         
-        'prefer avoiding adjacent known ships, but don't outright ban it. 80-20 sounds fair enough:
-        If this.Random.NextSingle < 0.2 Then
+        If this.Random.Maybe(AlmostNever) Then
             allowPosition = True
         
         Else
@@ -209,3 +215,4 @@ Private Function AvoidAdjacentHitPosition(ByVal enemyGrid As PlayerGrid, ByVal p
     End If
     AvoidAdjacentHitPosition = allowPosition
 End Function
+

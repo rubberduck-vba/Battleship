@@ -52,11 +52,11 @@ Public Property Get Address() As Long
 End Property
 
 #If VBA7 Then
-Public Property Let Address(ByVal Value As LongPtr)
+Public Property Let Address(ByVal value As LongPtr)
 #Else
-Public Property Let Address(ByVal Value As Long)
+Public Property Let Address(ByVal value As Long)
 #End If
-    this.Address = Value
+    this.Address = value
 End Property
 
 Private Property Get IWeakReference_Object() As Object

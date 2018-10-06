@@ -6,7 +6,7 @@ Attribute VB_Description = "Tests covering the Battleship.Ship class."
 Option Explicit
 Option Private Module
 
-Private Assert As Rubberduck.AssertClass
+Private Assert As Object 'Rubberduck.AssertClass
 'Private Fakes As Rubberduck.FakesProvider
 
 '@ModuleInitialize

@@ -115,32 +115,32 @@ Public Property Get ShipKind() As ShipType
     ShipKind = this.ShipKind
 End Property
 
-Public Property Let ShipKind(ByVal Value As ShipType)
-    this.ShipKind = Value
+Public Property Let ShipKind(ByVal value As ShipType)
+    this.ShipKind = value
 End Property
 
 Public Property Get Name() As String
     Name = this.Name
 End Property
 
-Public Property Let Name(ByVal Value As String)
-    this.Name = Value
+Public Property Let Name(ByVal value As String)
+    this.Name = value
 End Property
 
 Public Property Get Orientation() As ShipOrientation
     Orientation = this.Orientation
 End Property
 
-Public Property Let Orientation(ByVal Value As ShipOrientation)
-    this.Orientation = Value
+Public Property Let Orientation(ByVal value As ShipOrientation)
+    this.Orientation = value
 End Property
 
 Public Property Get GridPosition() As GridCoord
     Set GridPosition = this.GridPosition
 End Property
 
-Public Property Set GridPosition(ByVal Value As GridCoord)
-    Set this.GridPosition = Value
+Public Property Set GridPosition(ByVal value As GridCoord)
+    Set this.GridPosition = value
 End Property
 
 Public Property Get State() As Dictionary

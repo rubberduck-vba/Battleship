@@ -7,7 +7,7 @@ Attribute VB_GlobalNameSpace = False
 Attribute VB_Creatable = False
 Attribute VB_PredeclaredId = True
 Attribute VB_Exposed = True
-'@Folder("Battleship.Model")
+'@Folder("Battleship.Model.Grid")
 '@IgnoreModule UseMeaningfulName; X and Y are perfectly fine names here.
 Option Explicit
 Implements IGridCoord
@@ -52,16 +52,16 @@ Public Property Get X() As Long
     X = this.X
 End Property
 
-Public Property Let X(ByVal Value As Long)
-    this.X = Value
+Public Property Let X(ByVal value As Long)
+    this.X = value
 End Property
 
 Public Property Get Y() As Long
     Y = this.Y
 End Property
 
-Public Property Let Y(ByVal Value As Long)
-    this.Y = Value
+Public Property Let Y(ByVal value As Long)
+    this.Y = value
 End Property
 
 Public Property Get Default() As IGridCoord

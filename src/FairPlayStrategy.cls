@@ -8,6 +8,7 @@ Attribute VB_Creatable = False
 Attribute VB_PredeclaredId = True
 Attribute VB_Exposed = False
 '@Folder("Battleship.AI")
+'@Description("A strategy that deploys ships in the first legal random position found, and shoots at random until an enemy ship is found.")
 Option Explicit
 Implements IGameStrategy
 
@@ -33,8 +34,8 @@ Public Property Get Random() As IRandomizer
     Set Random = this.Random
 End Property
 
-Public Property Set Random(ByVal Value As IRandomizer)
-    Set this.Random = Value
+Public Property Set Random(ByVal value As IRandomizer)
+    Set this.Random = value
 End Property
 
 Private Sub Class_Initialize()
@@ -47,7 +48,7 @@ Private Sub IGameStrategy_PlaceShip(ByVal grid As PlayerGrid, ByVal currentShip 
         Dim position As IGridCoord
         Set position = base.PlaceShip(Random, grid, currentShip, direction)
         
-    Loop Until Not grid.HasAdjacentShip(position, direction, currentShip.Size)
+    Loop Until Not grid.HasAdjacentShip(position, direction, currentShip.Size) Or Random.Maybe(AlmostNever)
     
     grid.AddShip Ship.Create(currentShip.ShipKind, direction, position)
     If grid.shipCount = PlayerGrid.ShipsPerGrid Then grid.Scramble

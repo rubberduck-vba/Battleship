@@ -11,6 +11,19 @@ Attribute VB_Exposed = False
 '@Interface
 Option Explicit
 
+Public Enum Probability
+    Never        '   0.0%
+    AlmostNever  '   7.5%
+    Rarely       '  20.0%
+    Sometimes    '  50.0%
+    Often        '  75.0%
+    AlmostAlways '  92.5%
+    Always       ' 100.0%
+End Enum
+
+Public Function Maybe(ByVal likelihood As Probability) As Boolean
+End Function
+
 Public Function NextSingle() As Single
 End Function
 

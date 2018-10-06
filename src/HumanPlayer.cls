@@ -36,24 +36,24 @@ Public Property Get PlayGrid() As PlayerGrid
     Set PlayGrid = this.PlayGrid
 End Property
 
-Public Property Set PlayGrid(ByVal Value As PlayerGrid)
-    Set this.PlayGrid = Value
+Public Property Set PlayGrid(ByVal value As PlayerGrid)
+    Set this.PlayGrid = value
 End Property
 
 Public Property Get GridIndex() As Byte
     GridIndex = this.GridIndex
 End Property
 
-Public Property Let GridIndex(ByVal Value As Byte)
-    this.GridIndex = Value
+Public Property Let GridIndex(ByVal value As Byte)
+    this.GridIndex = value
 End Property
 
 Public Property Get PlayerType() As PlayerType
     PlayerType = this.PlayerType
 End Property
 
-Public Property Let PlayerType(ByVal Value As PlayerType)
-    this.PlayerType = Value
+Public Property Let PlayerType(ByVal value As PlayerType)
+    this.PlayerType = value
 End Property
 
 Private Sub IPlayer_PlaceShip(ByVal currentShip As IShip)
