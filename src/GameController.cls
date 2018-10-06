@@ -92,6 +92,10 @@ Private Sub OnShipPositionStart()
     
 End Sub
 
+Private Sub viewAdapter_OnGameOver(ByVal winner As IPlayer)
+    Teardown
+End Sub
+
 Private Sub viewAdapter_OnPreviewCurrentShipPosition(ByVal gridId As Byte, ByVal position As IGridCoord)
     On Error Resume Next
     Set currentShip = Ship.Create(currentShip.ShipKind, currentShip.Orientation, position)
@@ -181,6 +185,7 @@ Private Sub PlayAIvsAI()
         PlayAI
         EndCurrentPlayerTurn
     Loop
+    Teardown
 End Sub
 
 Private Sub PlayAI()
@@ -229,3 +234,7 @@ Private Sub EndCurrentPlayerTurn()
     End If
 End Sub
 
+Private Sub Teardown()
+    Set view = Nothing
+    Set viewAdapter = Nothing
+End Sub

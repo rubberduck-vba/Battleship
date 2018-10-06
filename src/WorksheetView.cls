@@ -13,7 +13,7 @@ Attribute VB_Description = "Facade implementation for a Worksheet-based user int
 Option Explicit
 Implements IGridViewCommands
 
-Private adapter As IWeakReference
+Private adapter As GridViewAdapter ' IWeakReference
 Private WithEvents sheetUI As GameSheet
 Attribute sheetUI.VB_VarHelpID = -1
 
@@ -21,8 +21,12 @@ Private Sub Class_Initialize()
     Set sheetUI = GameSheet
 End Sub
 
+Private Sub Class_Terminate()
+    Debug.Print TypeName(Me) & " is terminating"
+End Sub
+
 Private Property Get ViewEvents() As IGridViewEvents
-    Set ViewEvents = adapter.Object
+    Set ViewEvents = adapter '.Object
 End Property
 
 
@@ -63,12 +67,12 @@ End Sub
 ':Messages sent from the controller
 ':*********************************
 
-Private Property Set IGridViewCommands_Events(ByVal Value As IGridViewEvents)
-    Set adapter = WeakReference.Create(Value)
+Private Property Set IGridViewCommands_Events(ByVal value As IGridViewEvents)
+    Set adapter = value ' WeakReference.Create(Value)
 End Property
 
 Private Property Get IGridViewCommands_Events() As IGridViewEvents
-    Set IGridViewCommands_Events = adapter.Object
+    Set IGridViewCommands_Events = adapter '.Object
 End Property
 
 Private Sub IGridViewCommands_OnBeginAttack(ByVal currentPlayerGridId As Byte)
@@ -97,8 +101,10 @@ Private Sub IGridViewCommands_OnGameOver(ByVal winningGridId As Byte)
     With sheetUI
         .ShowAnimationVictory winningGridId
         .ShowAnimationDefeat IIf(winningGridId = 1, 2, 1)
+        .ShowReplayButton
         .LockGrids
     End With
+    Application.Cursor = xlDefault
 End Sub
 
 Private Sub IGridViewCommands_OnHit(ByVal gridId As Byte)

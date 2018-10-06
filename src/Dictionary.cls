@@ -64,7 +64,7 @@ Attribute CompareMode.VB_Description = "Set or get the string comparison method.
     CompareMode = dict_pDictionary.CompareMode
 #End If
 End Property
-Public Property Let CompareMode(Value As CompareMethod)
+Public Property Let CompareMode(value As CompareMethod)
 #If Mac Or Not UseScriptingDictionaryIfAvailable Then
     If Me.Count > 0 Then
         ' Can't change CompareMode for Dictionary that contains data
@@ -72,9 +72,9 @@ Public Property Let CompareMode(Value As CompareMethod)
         Err.Raise 5 ' Invalid procedure call or argument
     End If
 
-    dict_pCompareMode = Value
+    dict_pCompareMode = value
 #Else
-    dict_pDictionary.CompareMode = Value
+    dict_pDictionary.CompareMode = value
 #End If
 End Property
 
@@ -111,26 +111,26 @@ Attribute Item.VB_UserMemId = 0
     End If
 #End If
 End Property
-Public Property Let Item(Key As Variant, Value As Variant)
+Public Property Let Item(Key As Variant, value As Variant)
 #If Mac Or Not UseScriptingDictionaryIfAvailable Then
     If Me.Exists(Key) Then
-        dict_ReplaceKeyValue dict_GetKeyValue(Key), Key, Value
+        dict_ReplaceKeyValue dict_GetKeyValue(Key), Key, value
     Else
-        dict_AddKeyValue Key, Value
+        dict_AddKeyValue Key, value
     End If
 #Else
-    dict_pDictionary.Item(Key) = Value
+    dict_pDictionary.Item(Key) = value
 #End If
 End Property
-Public Property Set Item(Key As Variant, Value As Variant)
+Public Property Set Item(Key As Variant, value As Variant)
 #If Mac Or Not UseScriptingDictionaryIfAvailable Then
     If Me.Exists(Key) Then
-        dict_ReplaceKeyValue dict_GetKeyValue(Key), Key, Value
+        dict_ReplaceKeyValue dict_GetKeyValue(Key), Key, value
     Else
-        dict_AddKeyValue Key, Value
+        dict_AddKeyValue Key, value
     End If
 #Else
-    Set dict_pDictionary.Item(Key) = Value
+    Set dict_pDictionary.Item(Key) = value
 #End If
 End Property
 

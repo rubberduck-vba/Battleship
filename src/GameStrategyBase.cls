@@ -19,7 +19,7 @@ Public Function PlaceShip(ByVal randomizer As IRandomizer, ByVal grid As PlayerG
         If gridX + currentShip.Size - 1 > PlayerGrid.Size Then
             direction = Vertical
         Else
-            direction = IIf(randomizer.NextSingle < 0.5, Horizontal, Vertical)
+            direction = IIf(randomizer.Maybe(Sometimes), Horizontal, Vertical)
         End If
         
         Dim gridY As Long
@@ -64,44 +64,11 @@ End Function
 
 '@Description("Attempts to expand the provided area to destroy an identified target. May attempt to shoot outside the grid boundaries.")
 Public Function DestroyTarget(ByVal randomizer As IRandomizer, ByVal grid As PlayerGrid, ByVal area As VBA.Collection) As IGridCoord
-
-    Dim inferredDirection As ShipOrientation
-    inferredDirection = TryInferDirection(randomizer, area)
-    
-    Dim result As IGridCoord
-    
-    If inferredDirection = Horizontal Then
-        If randomizer.NextSingle < 0.5 Then
-            Set result = FindLeftMostHit(area)
-            If result.X > 1 Then Set result = result.Offset(xOffset:=-1)
-            If result.X < 1 Or grid.State(result) = PreviousMiss Then
-                Set result = FindRightMostHit(area).Offset(xOffset:=1)
-            End If
-        Else
-            Set result = FindRightMostHit(area)
-            If result.X < PlayerGrid.Size Then Set result = result.Offset(xOffset:=1)
-            If result.X > PlayerGrid.Size Or grid.State(result) = PreviousMiss Then
-                Set result = FindLeftMostHit(area).Offset(xOffset:=-1)
-            End If
-        End If
+    If TryInferDirection(randomizer, area) = Horizontal Then
+        Set DestroyTarget = FindHorizontalHit(randomizer, grid, area)
     Else
-        If randomizer.NextSingle < 0.5 Then
-            Set result = FindTopMostHit(area)
-            If result.Y > 1 Then Set result = result.Offset(yOffset:=-1)
-            If result.Y < 1 Or grid.State(result) = PreviousMiss Then
-                Set result = FindBottomMostHit(area).Offset(yOffset:=1)
-            End If
-        Else
-            Set result = FindBottomMostHit(area)
-            If result.Y < PlayerGrid.Size Then Set result = result.Offset(yOffset:=1)
-            If result.Y > PlayerGrid.Size Or grid.State(result) = PreviousMiss Then
-                Set result = FindTopMostHit(area).Offset(yOffset:=-1)
-            End If
-        End If
+        Set DestroyTarget = FindVerticalHit(randomizer, grid, area)
     End If
-                    
-    Set DestroyTarget = result
-    
 End Function
 
 '@Description("Attempts to infer a direction from the given area.")
@@ -113,8 +80,7 @@ Public Function TryInferDirection(ByVal randomizer As IRandomizer, ByVal area As
     For Each currentPosition In area
         If previousPosition Is Nothing Then
             Set previousPosition = currentPosition
-            'could be either (ignoring remaining enemy ships)
-            TryInferDirection = IIf(randomizer.NextSingle < 0.5, Horizontal, Vertical)
+            TryInferDirection = IIf(randomizer.Maybe(Sometimes), Horizontal, Vertical)
         Else
             If currentPosition.Y = previousPosition.Y Then
                 TryInferDirection = Horizontal
@@ -126,6 +92,42 @@ Public Function TryInferDirection(ByVal randomizer As IRandomizer, ByVal area As
         End If
     Next
 
+End Function
+
+Private Function FindHorizontalHit(ByVal randomizer As IRandomizer, ByVal grid As PlayerGrid, ByVal area As VBA.Collection) As IGridCoord
+    Dim result As IGridCoord
+    If randomizer.Maybe(Sometimes) Then
+        Set result = FindLeftMostHit(area)
+        If result.X > 1 Then Set result = result.Offset(xOffset:=-1)
+        If result.X < 1 Or grid.State(result) = PreviousMiss Then
+            Set result = FindRightMostHit(area).Offset(xOffset:=1)
+        End If
+    Else
+        Set result = FindRightMostHit(area)
+        If result.X < PlayerGrid.Size Then Set result = result.Offset(xOffset:=1)
+        If result.X > PlayerGrid.Size Or grid.State(result) = PreviousMiss Then
+            Set result = FindLeftMostHit(area).Offset(xOffset:=-1)
+        End If
+    End If
+    Set FindHorizontalHit = result
+End Function
+
+Private Function FindVerticalHit(ByVal randomizer As IRandomizer, ByVal grid As PlayerGrid, ByVal area As VBA.Collection) As IGridCoord
+    Dim result As IGridCoord
+    If randomizer.Maybe(Sometimes) Then
+        Set result = FindTopMostHit(area)
+        If result.Y > 1 Then Set result = result.Offset(yOffset:=-1)
+        If result.Y < 1 Or grid.State(result) = PreviousMiss Then
+            Set result = FindBottomMostHit(area).Offset(yOffset:=1)
+        End If
+    Else
+        Set result = FindBottomMostHit(area)
+        If result.Y < PlayerGrid.Size Then Set result = result.Offset(yOffset:=1)
+        If result.Y > PlayerGrid.Size Or grid.State(result) = PreviousMiss Then
+            Set result = FindTopMostHit(area).Offset(yOffset:=-1)
+        End If
+    End If
+    Set FindVerticalHit = result
 End Function
 
 '@Description("Gets the left-most hit in the specified area.")
@@ -274,6 +276,11 @@ Private Function FitsVertically(ByVal enemyGrid As PlayerGrid, ByVal position As
     End If
     
 End Function
+
+
+
+
+
 
 
 

@@ -7,18 +7,15 @@ Attribute VB_GlobalNameSpace = False
 Attribute VB_Creatable = False
 Attribute VB_PredeclaredId = True
 Attribute VB_Exposed = True
-'@Folder("Battleship.Model.Player")
+'@Folder("Battleship.Model.Grid")
 Option Explicit
 
 Private Const GridSize As Byte = 10
 Private Const MaxShipsPerGrid As Byte = 5
 
-Private Const KnownGridStateErrorMsg As String _
-    = "Specified coordinate is not in an unknown state."
-Private Const CannotAddShipAtPositionMsg As String _
-    = "Cannot add a ship of this size at this position."
-Private Const CannotAddMoreShipsMsg As String _
-    = "Cannot add more ships to this grid."
+Private Const KnownGridStateErrorMsg As String = "Specified coordinate is not in an unknown state."
+Private Const CannotAddShipAtPositionMsg As String = "Cannot add a ship of this size at this position."
+Private Const CannotAddMoreShipsMsg As String = "Cannot add more ships to this grid."
 
 Public Enum PlayerGridErrors
     KnownGridStateError = vbObjectError Or 127
@@ -27,9 +24,13 @@ Public Enum PlayerGridErrors
 End Enum
 
 Public Enum AttackResult
+    '@Description("Position is marked for salvo attack (Salvo mode only).")
     Marked
+    '@Description("Attack at specified position resulted in a miss.")
     Miss
+    '@Description("Attack at specified position resulted in a hit.")
     Hit
+    '@Description("Attack at specified position sunk a ship.")
     Sunk
 End Enum
 
@@ -67,10 +68,12 @@ Public Property Get Self() As PlayerGrid
     Set Self = Me
 End Property
 
+'@Description("Gets the size of a player game grid.")
 Public Property Get Size() As Byte
     Size = GridSize
 End Property
 
+'@Description("Gets the number of ships in a player's grid at the end of the deployment phase.")
 Public Property Get ShipsPerGrid() As Byte
     ShipsPerGrid = MaxShipsPerGrid
 End Property
@@ -80,8 +83,8 @@ Public Property Get gridId() As Byte
     gridId = this.Id
 End Property
 
-Public Property Let gridId(ByVal Value As Byte)
-    this.Id = Value
+Public Property Let gridId(ByVal value As Byte)
+    this.Id = value
 End Property
 
 '@Description("Gets the number of ships placed on the grid.")
@@ -89,7 +92,7 @@ Public Property Get shipCount() As Long
     shipCount = this.ships.Count
 End Property
 
-'@Description("Gets a collection containing all ships on this grid.")
+'@Description("Gets a collection containing all ships on this grid, sunken or afloat.")
 Public Property Get Fleet() As Collection
     Dim result As Collection
     Set result = New Collection
@@ -100,6 +103,7 @@ Public Property Get Fleet() As Collection
     Set Fleet = result
 End Property
 
+'@Description("Gets the size of the smallest ship still afloat on this grid.")
 Public Property Get SmallestShipSize() As Byte
     Dim result As Byte
     Dim currentShip As IShip
@@ -295,9 +299,9 @@ Public Property Get StateArray() As Variant
     For currentX = 1 To GridSize
         Dim currentY As Long
         For currentY = 1 To GridSize
-            Dim Value As GridState
-            Value = this.State(currentX, currentY)
-            result(currentX, currentY) = IIf(Value = Unknown, Empty, Value)
+            Dim value As GridState
+            value = this.State(currentX, currentY)
+            result(currentX, currentY) = IIf(value = Unknown, Empty, value)
         Next
     Next
     StateArray = result
@@ -361,7 +365,4 @@ Public Sub Scramble()
         Next
     Next
 End Sub
-
-
-
 

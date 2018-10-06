@@ -5,7 +5,7 @@ Attribute VB_Name = "GameStrategyBaseTests"
 Option Explicit
 Option Private Module
 
-Private Assert As Rubberduck.AssertClass
+Private Assert As Object 'Rubberduck.AssertClass
 'Private Fakes As Rubberduck.FakesProvider
 
 '@ModuleInitialize
@@ -192,3 +192,70 @@ Public Sub VerifyShipFits_TrueGivenAdjacentHitArea()
     Assert.IsTrue sut.VerifyShipFits(grid, position, 5)
     
 End Sub
+
+'@TestMethod
+Public Sub IsLegalPosition_TrueGivenUnknownStatePositionInsideGrid()
+    Dim grid As PlayerGrid
+    Set grid = PlayerGrid.Create(1)
+    
+    Dim position As IGridCoord
+    Set position = GridCoord.Create(1, 1)
+    
+    Dim sut As GameStrategyBase
+    Set sut = New GameStrategyBase
+    Assert.IsTrue sut.IsLegalPosition(grid, position)
+End Sub
+
+'@TestMethod
+Public Sub IsLegalPosition_FalseGivenKnownHitWithPositionInsideGrid()
+    Dim grid As PlayerGrid
+    Set grid = PlayerGrid.Create(1)
+    
+    Dim position As IGridCoord
+    Set position = GridCoord.Create(1, 1)
+    
+    grid.AddShip Ship.Create(Battleship, Horizontal, position)
+    grid.Scramble
+    
+    If grid.TryHit(position) <> Hit Then
+        Assert.Inconclusive "Could not reveal a known hit state."
+    End If
+    
+    Dim sut As GameStrategyBase
+    Set sut = New GameStrategyBase
+    Assert.IsFalse sut.IsLegalPosition(grid, position)
+    
+End Sub
+
+'@TestMethod
+Public Sub IsLegalPosition_FalseGivenKnownMissWithPositionInsideGrid()
+    Dim grid As PlayerGrid
+    Set grid = PlayerGrid.Create(1)
+    
+    Dim position As IGridCoord
+    Set position = GridCoord.Create(1, 1)
+    
+    If grid.TryHit(position) <> Miss Then
+        Assert.Inconclusive "Could not reveal a known miss state."
+    End If
+    
+    Dim sut As GameStrategyBase
+    Set sut = New GameStrategyBase
+    Assert.IsFalse sut.IsLegalPosition(grid, position)
+    
+End Sub
+
+'@TestMethod
+Public Sub IsLegalPosition_FalseGivenOutsideGrid()
+    Dim grid As PlayerGrid
+    Set grid = PlayerGrid.Create(1)
+    
+    Dim position As IGridCoord
+    Set position = GridCoord.Create(0, 0)
+    
+    Dim sut As GameStrategyBase
+    Set sut = New GameStrategyBase
+    Assert.IsFalse sut.IsLegalPosition(grid, position)
+End Sub
+
+
