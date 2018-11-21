@@ -9,7 +9,7 @@ For Rubberduck contributors that know C# but don't do any VBA, this makes a dece
 
 ## Do I need [Rubberduck](https://github.com/rubberduck-vba/Rubberduck) to use this code?
 
-You don't. But you're definitely going to have a much better time with Rubberduck (although.. whether it's this project or another), be it only to enjoy navigating all these classes in a treeview with a customized folder hierarchy. You will not be able to run the unit tests without Rubberduck (`Assert` calls will fail to resolve), but you can absolutely run and explore this code without Rubberduck.
+You don't. But you're definitely going to have a much better time with Rubberduck (although.. that's true whether it's *this project* or any other!), be it only to enjoy navigating all these classes in a treeview with a customized folder hierarchy. You will not be able to run the unit tests without Rubberduck (`Assert` calls will fail to resolve), but you can absolutely run and explore this code without the most powerful open-source VBIDE add-in out there. Just know.. you're missing out :)
 
 ## How do I play?
 
