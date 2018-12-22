@@ -335,7 +335,9 @@ Private Sub ShowInformation(ByVal message As String)
                 .Characters.Delete
                 .Characters.Text = vbNewLine & message
                 .VerticalAlignment = xlVAlignTop
-                .VerticalOverflow = xlOartVerticalOverflowEllipsis
+                #If Version > "12.0" Then
+                  .VerticalOverflow = xlOartVerticalOverflowEllipsis
+                #End If
                 .HorizontalAlignment = xlHAlignLeft
             End With
         End With
@@ -357,7 +359,9 @@ Public Sub ShowError(ByVal message As String)
                 .Characters.Delete
                 .Characters.Text = vbNewLine & message
                 .VerticalAlignment = xlVAlignTop
-                .VerticalOverflow = xlOartVerticalOverflowEllipsis
+                #If Version > "12.0" Then
+                  .VerticalOverflow = xlOartVerticalOverflowEllipsis
+                #End If
                 .HorizontalAlignment = xlHAlignLeft
             End With
         End With
