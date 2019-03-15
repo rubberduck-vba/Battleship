@@ -13,7 +13,7 @@ Attribute VB_Description = "Default instance factory; avoid altering default ins
 Option Explicit
 Implements IWeakReference
 
-#If Win64 Then
+#If VBA7 Then
 Private Declare PtrSafe Sub CopyMemory Lib "kernel32.dll" Alias "RtlMoveMemory" (hpvDest As Any, hpvSource As Any, ByVal cbCopy As LongPtr)
 #Else
 Private Declare Sub CopyMemory Lib "kernel32.dll" Alias "RtlMoveMemory" (hpvDest As Any, hpvSource As Any, ByVal cbCopy As Long)
