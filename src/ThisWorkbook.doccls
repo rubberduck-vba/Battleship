@@ -1,5 +1,4 @@
 ﻿'@Folder("Excel Objects")
-'@Description("Interaction logic for the Battleship.ThisWorkbook workbook module.")
 Option Explicit
 
 Private Sub Workbook_BeforeClose(Cancel As Boolean)

@@ -1,4 +1,5 @@
 ﻿'@Folder("Battleship.View.Worksheet")
+'@IgnoreModule UseMeaningfulName
 Option Explicit
 
 Private Const InfoBoxMessage As String = _
@@ -29,11 +30,11 @@ Private Const ErrorBoxInvalidKnownAttackPosition As String = _
 Private previousMode As ViewMode
 Private Mode As ViewMode
 
-Public Event CreatePlayer(ByVal gridId As Byte, ByVal pt As PlayerType, ByVal difficulty As AIDifficulty)
+Public Event CreatePlayer(ByVal gridId As PlayGridId, ByVal pt As PlayerType, ByVal difficulty As AIDifficulty)
 Public Event PlayerReady()
-Public Event SelectionChange(ByVal gridId As Byte, ByVal position As IGridCoord, ByVal Mode As ViewMode)
-Public Event RightClick(ByVal gridId As Byte, ByVal position As IGridCoord, ByVal Mode As ViewMode)
-Public Event DoubleClick(ByVal gridId As Byte, ByVal position As IGridCoord, ByVal Mode As ViewMode)
+Public Event SelectionChange(ByVal gridId As PlayGridId, ByVal position As IGridCoord, ByVal Mode As ViewMode)
+Public Event RightClick(ByVal gridId As PlayGridId, ByVal position As IGridCoord, ByVal Mode As ViewMode)
+Public Event DoubleClick(ByVal gridId As PlayGridId, ByVal position As IGridCoord, ByVal Mode As ViewMode)
 
 Public Sub OnNewGame()
     Application.ScreenUpdating = False
@@ -54,8 +55,7 @@ Public Sub OnNewGame()
     Application.ScreenUpdating = True
 End Sub
 
-'@Description("Computes an grid position for a given Range in the given grid ID.")
-Public Function RangeToGridCoord(ByVal target As Range, ByRef gridId As Byte) As IGridCoord
+Public Function RangeToGridCoord(ByVal target As Range, ByRef gridId As PlayGridId) As IGridCoord
     If target.Count > 1 Then Exit Function
     For gridId = 1 To 2
         With PlayerGrid(gridId)
@@ -69,8 +69,7 @@ Public Function RangeToGridCoord(ByVal target As Range, ByRef gridId As Byte) As
     Next
 End Function
 
-'@Description("Computes a Range for the given grid position and grid ID.")
-Public Function GridCoordToRange(ByVal gridId As Byte, ByVal position As IGridCoord) As Range
+Public Function GridCoordToRange(ByVal gridId As PlayGridId, ByVal position As IGridCoord) As Range
     With PlayerGrid(gridId)
         Set GridCoordToRange = .Cells(position.Y, position.X)
     End With
@@ -78,10 +77,10 @@ End Function
 
 Private Sub Worksheet_BeforeDoubleClick(ByVal target As Range, ByRef Cancel As Boolean)
     Cancel = True
-    Dim gridId As Byte
+    Dim gridId As PlayGridId
     Dim position As IGridCoord
     Set position = RangeToGridCoord(target, gridId)
-    If Mode = FleetPosition Or Mode = player1 And gridId = 2 Or Mode = player2 And gridId = 1 Then
+    If Mode = FleetPosition Or Mode = Player1 And gridId = 2 Or Mode = Player2 And gridId = 1 Then
         RaiseEvent DoubleClick(gridId, position, Mode)
     End If
 End Sub
@@ -89,7 +88,7 @@ End Sub
 Private Sub Worksheet_BeforeRightClick(ByVal target As Range, Cancel As Boolean)
     Cancel = True
     If Mode = FleetPosition Then
-        Dim gridId As Byte
+        Dim gridId As PlayGridId
         Dim position As IGridCoord
         Set position = RangeToGridCoord(target, gridId)
         RaiseEvent RightClick(gridId, position, Mode)
@@ -97,7 +96,7 @@ Private Sub Worksheet_BeforeRightClick(ByVal target As Range, Cancel As Boolean)
 End Sub
 
 Private Sub Worksheet_SelectionChange(ByVal target As Range)
-    Dim gridId As Byte
+    Dim gridId As PlayGridId
     Dim position As IGridCoord
     Set position = RangeToGridCoord(target, gridId)
     If Not position Is Nothing Then
@@ -110,7 +109,7 @@ Private Sub Worksheet_SelectionChange(ByVal target As Range)
     End If
 End Sub
 
-Public Sub ClearGrid(ByVal gridId As Byte)
+Public Sub ClearGrid(ByVal gridId As PlayGridId)
     Me.Unprotect
     PlayerGrid(gridId).value = Empty
     Me.Protect
@@ -125,27 +124,27 @@ Public Sub LockGrids()
     Me.EnableSelection = xlUnlockedCells
 End Sub
 
-Public Sub UnlockGrid(ByVal gridId As Byte)
+Public Sub UnlockGrid(ByVal gridId As PlayGridId)
     Me.Unprotect
     PlayerGrid(gridId).Locked = False
-    PlayerGrid(IIf(gridId = 1, 2, 1)).Locked = True
+    PlayerGrid(IIf(gridId = PlayGridId.PlayerGrid1, PlayGridId.PlayerGrid2, PlayGridId.PlayerGrid1)).Locked = True
     Me.Protect
     Me.EnableSelection = xlUnlockedCells
 End Sub
 
-Public Sub LockGrid(ByVal gridId As Byte)
+Public Sub LockGrid(ByVal gridId As PlayGridId)
     Me.Unprotect
     PlayerGrid(gridId).Locked = True
-    PlayerGrid(IIf(gridId = 1, 2, 1)).Locked = False
+    PlayerGrid(IIf(gridId = PlayGridId.PlayerGrid1, PlayGridId.PlayerGrid2, PlayGridId.PlayerGrid1)).Locked = False
     Me.Protect
     Me.EnableSelection = xlUnlockedCells
 End Sub
 
-Private Property Get PlayerGrid(ByVal gridId As Byte) As Range
+Private Property Get PlayerGrid(ByVal gridId As PlayGridId) As Range
     Set PlayerGrid = Me.Names("PlayerGrid" & gridId).RefersToRange
 End Property
 
-Private Property Get CurrentSelectionGrid(ByVal gridId As Byte) As Range
+Private Property Get CurrentSelectionGrid(ByVal gridId As PlayGridId) As Range
     Set CurrentSelectionGrid = Me.Names("CurrentSelectionGrid" & gridId).RefersToRange
 End Property
 
@@ -153,23 +152,23 @@ Private Property Get TitleLabel() As Shape
     Set TitleLabel = Me.Shapes("Title")
 End Property
 
-Private Property Get MissLabel(ByVal gridId As Byte) As Shape
+Private Property Get MissLabel(ByVal gridId As PlayGridId) As Shape
     Set MissLabel = Me.Shapes("MissLabelGrid" & gridId)
 End Property
 
-Private Property Get HitLabel(ByVal gridId As Byte) As Shape
+Private Property Get HitLabel(ByVal gridId As PlayGridId) As Shape
     Set HitLabel = Me.Shapes("HitGrid" & gridId)
 End Property
 
-Private Property Get SunkLabel(ByVal gridId As Byte) As Shape
+Private Property Get SunkLabel(ByVal gridId As PlayGridId) As Shape
     Set SunkLabel = Me.Shapes("SunkGrid" & gridId)
 End Property
 
-Private Property Get GameOverWinLabel(ByVal gridId As Byte) As Shape
+Private Property Get GameOverWinLabel(ByVal gridId As PlayGridId) As Shape
     Set GameOverWinLabel = Me.Shapes("GameOverWinGrid" & gridId)
 End Property
 
-Private Property Get GameOverLoseLabel(ByVal gridId As Byte) As Shape
+Private Property Get GameOverLoseLabel(ByVal gridId As PlayGridId) As Shape
     Set GameOverLoseLabel = Me.Shapes("GameOverLoseGrid" & gridId)
 End Property
 
@@ -189,27 +188,27 @@ Private Property Get FleetStatusBox() As Shape
     Set FleetStatusBox = Me.Shapes("FleetStatusBox")
 End Property
 
-Private Property Get AcquiredTargetsBox(ByVal gridId As Byte) As Shape
+Private Property Get AcquiredTargetsBox(ByVal gridId As PlayGridId) As Shape
     Set AcquiredTargetsBox = Me.Shapes("Grid" & gridId & "TargetsBox")
 End Property
 
-Private Property Get AcquiredTargetShip(ByVal gridId As Byte, ByVal shipName As String) As Shape
+Private Property Get AcquiredTargetShip(ByVal gridId As PlayGridId, ByVal shipName As String) As Shape
     Set AcquiredTargetShip = Me.Shapes("Grid" & gridId & "Target_" & VBA.Strings.Replace(shipName, " ", vbNullString))
 End Property
 
-Private Property Get ShipHitMarker(ByVal shipName As String, ByVal index As Byte) As Shape
+Private Property Get ShipHitMarker(ByVal shipName As String, ByVal index As PlayGridId) As Shape
     Set ShipHitMarker = Me.Shapes(VBA.Strings.Replace(shipName, " ", vbNullString) & "_Hit" & index)
 End Property
 
-Private Property Get SunkTargetMarker(ByVal gridId As Byte, ByVal shipName As String) As Shape
+Private Property Get SunkTargetMarker(ByVal gridId As PlayGridId, ByVal shipName As String) As Shape
     Set SunkTargetMarker = Me.Shapes("Grid" & gridId & "TargetSunk_" & VBA.Strings.Replace(shipName, " ", vbNullString))
 End Property
 
-Private Property Get HumanPlayerButton(ByVal gridId As Byte) As Shape
+Private Property Get HumanPlayerButton(ByVal gridId As PlayGridId) As Shape
     Set HumanPlayerButton = Me.Shapes("HumanPlayer" & gridId)
 End Property
 
-Private Property Get AIPlayerButton(ByVal gridId As Byte, ByVal difficulty As AIDifficulty) As Shape
+Private Property Get AIPlayerButton(ByVal gridId As PlayGridId, ByVal difficulty As AIDifficulty) As Shape
     Select Case difficulty
         Case AIDifficulty.RandomAI
             Set AIPlayerButton = Me.Shapes("RandomAIPlayer" & gridId)
@@ -220,7 +219,7 @@ Private Property Get AIPlayerButton(ByVal gridId As Byte, ByVal difficulty As AI
     End Select
 End Property
 
-Private Sub HidePlayerButtons(Optional ByVal gridId As Byte)
+Private Sub HidePlayerButtons(Optional ByVal gridId As PlayGridId)
     If gridId = 0 Then
         For gridId = 1 To 2
             HideShapes HumanPlayerButton(gridId), _
@@ -237,15 +236,15 @@ Private Sub HidePlayerButtons(Optional ByVal gridId As Byte)
 End Sub
 
 Public Sub OnHumanPlayer1()
-    HidePlayerButtons 1
-    HideShapes HumanPlayerButton(2)
-    RaiseEvent CreatePlayer(1, HumanControlled, Unspecified)
+    HidePlayerButtons PlayGridId.PlayerGrid1
+    HideShapes HumanPlayerButton(PlayGridId.PlayerGrid2)
+    RaiseEvent CreatePlayer(PlayGridId.PlayerGrid1, HumanControlled, Unspecified)
 End Sub
 
 Public Sub OnHumanPlayer2()
-    HidePlayerButtons 2
-    HideShapes HumanPlayerButton(1)
-    RaiseEvent CreatePlayer(2, HumanControlled, Unspecified)
+    HidePlayerButtons PlayGridId.PlayerGrid2
+    HideShapes HumanPlayerButton(PlayGridId.PlayerGrid1)
+    RaiseEvent CreatePlayer(PlayGridId.PlayerGrid2, HumanControlled, Unspecified)
 End Sub
 
 Public Sub OnRandomAIPlayer1()
@@ -281,14 +280,14 @@ End Sub
 Public Sub HideInformationBox()
     InformationBox.Visible = msoFalse
     Mode = previousMode
-    If Mode = player1 Then
+    If Mode = Player1 Then
         UnlockGrid 2
-    ElseIf Mode = player2 Then
+    ElseIf Mode = Player2 Then
         UnlockGrid 1
     End If
     Me.Protect
     Me.EnableSelection = xlUnlockedCells
-    If Mode = player1 Or Mode = player2 Then RaiseEvent PlayerReady
+    If Mode = Player1 Or Mode = Player2 Then RaiseEvent PlayerReady
 End Sub
 
 Public Sub HideErrorBox()
@@ -304,8 +303,8 @@ Public Sub ShowInfoBeginDeployShip(ByVal shipName As String)
     ShowInformation Replace(InfoBoxPlaceShips, "%SHIP%", UCase$(shipName))
 End Sub
 
-Public Sub ShowInfoBeginAttackPhase(ByVal currentPlayerGridId As Byte)
-    Mode = IIf(currentPlayerGridId = 1, player1, player2)
+Public Sub ShowInfoBeginAttackPhase(ByVal currentPlayerGridId As PlayGridId)
+    Mode = IIf(currentPlayerGridId = PlayGridId.PlayerGrid1, Player1, Player2)
     ShowInformation InfoBoxMessage
 End Sub
 
@@ -530,7 +529,7 @@ Private Sub ShowAcquiredTargetBoxes()
     
 End Sub
 
-Public Sub ShowAcquiredTarget(ByVal gridId As Byte, ByVal shipName As String, Optional ByVal sunken As Boolean = False)
+Public Sub ShowAcquiredTarget(ByVal gridId As PlayGridId, ByVal shipName As String, Optional ByVal sunken As Boolean = False)
     AcquiredTargetsBox(gridId).Visible = msoTrue
     AcquiredTargetShip(gridId, shipName).Visible = msoTrue
     SunkTargetMarker(gridId, shipName).Visible = IIf(sunken, msoTrue, msoFalse)
@@ -553,7 +552,8 @@ Public Sub UpdateShipStatus(ByVal player As IPlayer, ByVal hitShip As IShip)
     Dim positions As Variant
     positions = hitShip.StateArray
     
-    Dim currentPosition As Byte, currentMarker As Byte
+    Dim currentPosition As Byte
+    Dim currentMarker As Byte
     
     For currentPosition = LBound(positions) To UBound(positions)
         currentMarker = currentMarker + 1
@@ -568,30 +568,30 @@ Public Sub UpdateShipStatus(ByVal player As IPlayer, ByVal hitShip As IShip)
     
 End Sub
 
-Public Sub ShowAnimationMiss(ByVal gridId As Byte)
+Public Sub ShowAnimationMiss(ByVal gridId As PlayGridId)
     With GameRandomizer
         FlashShape MissLabel(gridId), IIf(.NextSingle < 0.75, 1, IIf(.NextSingle < 0.75, 2, 3)), 10
     End With
 End Sub
 
-Public Sub ShowAnimationHit(ByVal gridId As Byte)
+Public Sub ShowAnimationHit(ByVal gridId As PlayGridId)
     With GameRandomizer
         FlashShape HitLabel(gridId), IIf(.NextSingle < 0.75, 1, IIf(.NextSingle < 0.75, 2, 3))
     End With
 End Sub
 
-Public Sub ShowAnimationSunk(ByVal gridId As Byte)
+Public Sub ShowAnimationSunk(ByVal gridId As PlayGridId)
     With GameRandomizer
         FlashShape SunkLabel(gridId), IIf(.NextSingle < 0.75, 2, 4), 12
     End With
 End Sub
 
-Public Sub ShowAnimationVictory(ByVal gridId As Byte)
+Public Sub ShowAnimationVictory(ByVal gridId As PlayGridId)
     GameOverWinLabel(gridId).Visible = msoTrue
     Mode = GameOver
 End Sub
 
-Public Sub ShowAnimationDefeat(ByVal gridId As Byte)
+Public Sub ShowAnimationDefeat(ByVal gridId As PlayGridId)
     FlashShape GameOverLoseLabel(gridId), 4
     GameOverLoseLabel(gridId).Visible = msoTrue
     Mode = GameOver
@@ -630,7 +630,8 @@ End Sub
 
 Public Sub ShowShapes(ParamArray objects() As Variant)
     Win32API.ScreenUpdate False
-    Dim i As Long, current As Shape
+    Dim i As Long
+    Dim current As Shape
     For i = LBound(objects) To UBound(objects)
         Set current = objects(i)
         current.Visible = msoTrue
@@ -640,7 +641,8 @@ End Sub
 
 Public Sub HideShapes(ParamArray objects() As Variant)
     Win32API.ScreenUpdate False
-    Dim i As Long, current As Shape
+    Dim i As Long
+    Dim current As Shape
     For i = LBound(objects) To UBound(objects)
         Set current = objects(i)
         current.Visible = msoFalse
@@ -676,6 +678,7 @@ Private Sub FlashShape(ByVal target As Shape, ByVal flashes As Long, Optional By
     Me.Protect
     
 End Sub
+
 
 
 

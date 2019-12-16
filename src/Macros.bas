@@ -1,20 +1,25 @@
 Attribute VB_Name = "Macros"
 Attribute VB_Description = "Application entry points."
 '@Folder("Battleship")
-'@Description("Application entry points.")
+'@ModuleDescription("Application entry points.")
 Option Explicit
 '@Ignore MoveFieldCloserToUsage
-Private controller As GameController
+Private controller As IGameController
 
 Public Sub PlayWorksheetInterface()
-    Dim view As WorksheetView
-    Set view = New WorksheetView
+    
+    Dim adapter As GridViewAdapter
+    Set adapter = GridViewAdapter.Create(New WorksheetView)
     
     Dim randomizer As IRandomizer
     Set randomizer = New GameRandomizer
     
-    Set controller = New GameController
-    controller.NewGame GridViewAdapter.Create(view), randomizer
+    Dim players As IPlayerFactory
+    Set players = PlayerFactory.Create(randomizer)
+    
+    Set controller = StandardGameController.Create(adapter, randomizer, players)
+    controller.NewGame
+    
 End Sub
 
 '@Ignore StopKeyword

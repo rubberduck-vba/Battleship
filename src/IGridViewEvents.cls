@@ -7,24 +7,26 @@ Attribute VB_GlobalNameSpace = False
 Attribute VB_Creatable = False
 Attribute VB_PredeclaredId = False
 Attribute VB_Exposed = True
-'@Folder("Battleship.View")
-'@Description("Commands sent from the view to the GridViewAdapter.")
+Attribute VB_Description = "Commands sent from the view to the GridViewAdapter."
+'@Exposed
+'@Folder("Battleship.View.Abstract")
+'@ModuleDescription("Commands sent from the view to the GridViewAdapter.")
 '@Interface
 Option Explicit
 
-Public Sub CreatePlayer(ByVal gridId As Byte, ByVal pt As PlayerType, ByVal difficulty As AIDifficulty)
+Public Sub CreatePlayer(ByVal gridId As PlayGridId, ByVal pt As PlayerType, ByVal difficulty As AIDifficulty)
 End Sub
 
-Public Sub PreviewRotateShip(ByVal gridId As Byte, ByVal position As IGridCoord)
+Public Sub PreviewRotateShip(ByVal gridId As PlayGridId, ByVal position As IGridCoord)
 End Sub
 
-Public Sub PreviewShipPosition(ByVal gridId As Byte, ByVal position As IGridCoord)
+Public Sub PreviewShipPosition(ByVal gridId As PlayGridId, ByVal position As IGridCoord)
 End Sub
 
-Public Sub ConfirmShipPosition(ByVal gridId As Byte, ByVal position As IGridCoord)
+Public Sub ConfirmShipPosition(ByVal gridId As PlayGridId, ByVal position As IGridCoord)
 End Sub
 
-Public Sub AttackPosition(ByVal gridId As Byte, ByVal position As IGridCoord)
+Public Sub AttackPosition(ByVal gridId As PlayGridId, ByVal position As IGridCoord)
 End Sub
 
 Public Sub HumanPlayerReady()

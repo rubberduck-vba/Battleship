@@ -1,7 +1,7 @@
 Attribute VB_Name = "Win32API"
 Attribute VB_Description = "Win32 utility function imports."
-'@Folder("Battleship.Win32")
-'@Description("Win32 utility function imports.")
+'@Folder("Win32")
+'@ModuleDescription("Win32 utility function imports.")
 '@IgnoreModule UserMeaningfulName, HungarianNotation; Win32 parameter names are what they are
 Option Explicit
 Option Private Module

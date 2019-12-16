@@ -7,7 +7,8 @@ Attribute VB_GlobalNameSpace = False
 Attribute VB_Creatable = False
 Attribute VB_PredeclaredId = False
 Attribute VB_Exposed = True
-'@Folder("Battleship.AI")
+'@Exposed
+'@Folder("Battleship.Model.Abstract")
 '@Interface
 Option Explicit
 
@@ -19,9 +20,11 @@ Public Enum AIDifficulty
 End Enum
 
 '@Description("Places the specified ship on the specified grid.")
-Public Sub PlaceShip(ByVal grid As PlayerGrid, ByVal currentShip As IShip)
+Public Sub PlaceShip(ByVal grid As PlayerGrid, ByVal CurrentShip As IShip)
+Attribute PlaceShip.VB_Description = "Places the specified ship on the specified grid."
 End Sub
 
 '@Description("Gets the grid coordinate to attack on the specified enemy grid.")
 Public Function Play(ByVal enemyGrid As PlayerGrid) As IGridCoord
+Attribute Play.VB_Description = "Gets the grid coordinate to attack on the specified enemy grid."
 End Function

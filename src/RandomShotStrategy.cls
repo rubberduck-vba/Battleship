@@ -7,8 +7,10 @@ Attribute VB_GlobalNameSpace = False
 Attribute VB_Creatable = False
 Attribute VB_PredeclaredId = True
 Attribute VB_Exposed = False
-'@Folder("Battleship.AI")
-'@Description("A strategy that deploys ships in the first legal random position found, and shoots at random until all enemy ships are found.")
+Attribute VB_Description = "A strategy that deploys ships in the first legal random position found, and shoots at random until all enemy ships are found."
+'@PredeclaredId
+'@Folder("Battleship.Model.AI")
+'@ModuleDescription("A strategy that deploys ships in the first legal random position found, and shoots at random until all enemy ships are found.")
 Option Explicit
 Implements IGameStrategy
 
@@ -42,13 +44,13 @@ Private Sub Class_Initialize()
     Set base = New GameStrategyBase
 End Sub
 
-Private Sub IGameStrategy_PlaceShip(ByVal grid As PlayerGrid, ByVal currentShip As IShip)
+Private Sub IGameStrategy_PlaceShip(ByVal grid As PlayerGrid, ByVal CurrentShip As IShip)
     
     Dim direction As ShipOrientation
     Dim position As IGridCoord
-    Set position = base.PlaceShip(Random, grid, currentShip, direction)
+    Set position = base.PlaceShip(Random, grid, CurrentShip, direction)
     
-    grid.AddShip Ship.Create(currentShip.ShipKind, direction, position)
+    grid.AddShip Ship.Create(CurrentShip.ShipKind, direction, position)
     If grid.shipCount = PlayerGrid.ShipsPerGrid Then grid.Scramble
     
 End Sub
@@ -71,9 +73,9 @@ Private Function EnemyShipsToFind(ByVal enemyGrid As PlayerGrid) As Byte
     
     Dim result As Byte
     
-    Dim currentShip As IShip
-    For Each currentShip In enemyFleet
-        If currentShip.HitAreas.Count = 0 Then result = result + 1
+    Dim CurrentShip As IShip
+    For Each CurrentShip In enemyFleet
+        If CurrentShip.HitAreas.Count = 0 Then result = result + 1
     Next
     
     EnemyShipsToFind = result

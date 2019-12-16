@@ -1,0 +1,32 @@
+﻿'@Folder("Battleship.Resources")
+Option Explicit
+
+Public Property Get Resource(ByVal key As String, ByVal cultureKey As String) As String
+    Dim columnIndex As Long
+    If Not TryGetCultureKeyColumnIndex(cultureKey, outIndex:=columnIndex) Then Exit Function
+    Dim rowIndex As Long
+    If Not TryGetResourceKeyRowIndex(key, outIndex:=rowIndex) Then Exit Function
+    Resource = table.DataBodyRange.Cells(rowIndex, columnIndex).value
+End Property
+
+Private Property Get table() As ListObject
+    Set table = Me.ListObjects(1)
+End Property
+
+Private Function TryGetCultureKeyColumnIndex(ByVal cultureKey As String, ByRef outIndex As Long) As Boolean
+    On Error Resume Next
+    Dim tableColumn As ListColumn
+    Set tableColumn = table.ListColumns(cultureKey)
+    On Error GoTo 0
+    If Not tableColumn Is Nothing Then
+        outIndex = tableColumn.index
+        TryGetCultureKeyColumnIndex = True
+    End If
+End Function
+
+Private Function TryGetResourceKeyRowIndex(ByVal key As String, ByRef outIndex As Long) As Boolean
+    On Error Resume Next
+    outIndex = Application.WorksheetFunction.Match(key, table.ListColumns("Key").DataBodyRange, 0)
+    On Error GoTo 0
+    TryGetResourceKeyRowIndex = (outIndex > 0)
+End Function

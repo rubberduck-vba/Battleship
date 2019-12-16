@@ -7,23 +7,26 @@ Attribute VB_GlobalNameSpace = False
 Attribute VB_Creatable = False
 Attribute VB_PredeclaredId = True
 Attribute VB_Exposed = False
-'@Folder("Battleship.Model.Player")
+Attribute VB_Description = "An implementation of IPlayer that is human-controlled."
+'@Folder("Battleship.Model")
+'@ModuleDescription("An implementation of IPlayer that is human-controlled.")
+'@PredeclaredId
 Option Explicit
 Implements IPlayer
 
 Private Type TPlayer
-    GridIndex As Byte
     PlayerType As PlayerType
     PlayGrid As PlayerGrid
 End Type
 
 Private this As TPlayer
 
-Public Function Create(ByVal gridId As Byte) As IPlayer
+'@Description("Creates a new HumanPlayer with the specified grid.")
+Public Function Create(ByVal grid As PlayerGrid) As IPlayer
+Attribute Create.VB_Description = "Creates a new HumanPlayer with the specified grid."
     With New HumanPlayer
-        .GridIndex = gridId
         .PlayerType = HumanControlled
-        Set .PlayGrid = PlayerGrid.Create(gridId)
+        Set .PlayGrid = grid
         Set Create = .Self
     End With
 End Function
@@ -40,14 +43,6 @@ Public Property Set PlayGrid(ByVal value As PlayerGrid)
     Set this.PlayGrid = value
 End Property
 
-Public Property Get GridIndex() As Byte
-    GridIndex = this.GridIndex
-End Property
-
-Public Property Let GridIndex(ByVal value As Byte)
-    this.GridIndex = value
-End Property
-
 Public Property Get PlayerType() As PlayerType
     PlayerType = this.PlayerType
 End Property
@@ -56,13 +51,13 @@ Public Property Let PlayerType(ByVal value As PlayerType)
     this.PlayerType = value
 End Property
 
-Private Sub IPlayer_PlaceShip(ByVal currentShip As IShip)
-    'human-controlled / no-op by design
+Private Sub IPlayer_PlaceShip(ByVal CurrentShip As IShip)
+    'no-op, ship placement is handled by view events.
 End Sub
 
-'@Ignore NonReturningFunction
 Private Function IPlayer_Play(ByVal enemyGrid As PlayerGrid) As IGridCoord
-    'human-controlled / no-op by design
+    'return value is irrelevant, play coord is provided by view events.
+    Set IPlayer_Play = GridCoord.Default
 End Function
 
 Private Property Get IPlayer_PlayGrid() As PlayerGrid

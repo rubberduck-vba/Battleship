@@ -7,16 +7,16 @@ Attribute VB_GlobalNameSpace = False
 Attribute VB_Creatable = False
 Attribute VB_PredeclaredId = False
 Attribute VB_Exposed = False
-'@Folder("Battleship.AI")
+'@Folder("Battleship.Model.AI")
 Option Explicit
 
-Public Function PlaceShip(ByVal randomizer As IRandomizer, ByVal grid As PlayerGrid, ByVal currentShip As IShip, ByRef outDirection As ShipOrientation) As IGridCoord
+Public Function PlaceShip(ByVal randomizer As IRandomizer, ByVal grid As PlayerGrid, ByVal CurrentShip As IShip, ByRef outDirection As ShipOrientation) As IGridCoord
     Do
         Dim gridX As Long
         gridX = randomizer.Between(1, PlayerGrid.Size)
         
         Dim direction As ShipOrientation
-        If gridX + currentShip.Size - 1 > PlayerGrid.Size Then
+        If gridX + CurrentShip.Size - 1 > PlayerGrid.Size Then
             direction = Vertical
         Else
             direction = IIf(randomizer.Maybe(Sometimes), Horizontal, Vertical)
@@ -26,19 +26,20 @@ Public Function PlaceShip(ByVal randomizer As IRandomizer, ByVal grid As PlayerG
         If direction = Horizontal Then
             gridY = randomizer.Between(1, PlayerGrid.Size)
         Else
-            gridY = randomizer.Between(1, PlayerGrid.Size - currentShip.Size)
+            gridY = randomizer.Between(1, PlayerGrid.Size - CurrentShip.Size)
         End If
         
         Dim position As GridCoord
         Set position = GridCoord.Create(gridX, gridY)
         
-    Loop Until grid.CanAddShip(position, direction, currentShip.Size)
+    Loop Until grid.CanAddShip(position, direction, CurrentShip.Size)
     outDirection = direction
     Set PlaceShip = position
 End Function
 
 '@Description("Gets a random grid position with an unknown state, within the grid boundaries.")
 Public Function ShootRandomPosition(ByVal randomizer As IRandomizer, ByVal grid As PlayerGrid) As IGridCoord
+Attribute ShootRandomPosition.VB_Description = "Gets a random grid position with an unknown state, within the grid boundaries."
     Dim position As IGridCoord
     Do
         Set position = GridCoord.Create( _
@@ -51,6 +52,7 @@ End Function
 
 '@Description("Returns True if the specified position is a legal attack position.")
 Public Function IsLegalPosition(ByVal grid As PlayerGrid, ByVal position As IGridCoord) As Boolean
+Attribute IsLegalPosition.VB_Description = "Returns True if the specified position is a legal attack position."
     Dim isInsideGrid As Boolean
     If Not position Is Nothing Then
         isInsideGrid = position.X >= 1 And position.X <= PlayerGrid.Size And _
@@ -64,6 +66,7 @@ End Function
 
 '@Description("Attempts to expand the provided area to destroy an identified target. May attempt to shoot outside the grid boundaries.")
 Public Function DestroyTarget(ByVal randomizer As IRandomizer, ByVal grid As PlayerGrid, ByVal area As VBA.Collection) As IGridCoord
+Attribute DestroyTarget.VB_Description = "Attempts to expand the provided area to destroy an identified target. May attempt to shoot outside the grid boundaries."
     If TryInferDirection(randomizer, area) = Horizontal Then
         Set DestroyTarget = FindHorizontalHit(randomizer, grid, area)
     Else
@@ -73,6 +76,7 @@ End Function
 
 '@Description("Attempts to infer a direction from the given area.")
 Public Function TryInferDirection(ByVal randomizer As IRandomizer, ByVal area As Collection) As ShipOrientation
+Attribute TryInferDirection.VB_Description = "Attempts to infer a direction from the given area."
     
     Dim previousPosition As GridCoord
     Dim currentPosition As GridCoord
@@ -132,6 +136,7 @@ End Function
 
 '@Description("Gets the left-most hit in the specified area.")
 Private Function FindLeftMostHit(ByVal area As Collection) As IGridCoord
+Attribute FindLeftMostHit.VB_Description = "Gets the left-most hit in the specified area."
     Dim leftMost As IGridCoord
     Set leftMost = area(1)
     
@@ -145,6 +150,7 @@ End Function
 
 '@Description("Gets the right-most hit in the specified area.")
 Private Function FindRightMostHit(ByVal area As Collection) As IGridCoord
+Attribute FindRightMostHit.VB_Description = "Gets the right-most hit in the specified area."
     Dim rightMost As IGridCoord
     Set rightMost = area(1)
     
@@ -158,6 +164,7 @@ End Function
 
 '@Description("Gets the top-most hit in the specified area.")
 Private Function FindTopMostHit(ByVal area As Collection) As IGridCoord
+Attribute FindTopMostHit.VB_Description = "Gets the top-most hit in the specified area."
     Dim topMost As IGridCoord
     Set topMost = area(1)
     
@@ -171,6 +178,7 @@ End Function
 
 '@Description("Gets the bottom-most hit in the specified area.")
 Private Function FindBottomMostHit(ByVal area As Collection) As IGridCoord
+Attribute FindBottomMostHit.VB_Description = "Gets the bottom-most hit in the specified area."
     Dim bottomMost As IGridCoord
     Set bottomMost = area(1)
     
@@ -184,6 +192,7 @@ End Function
 
 '@Description("Returns True if the smallest remaining ship could fit at the specified position.")
 Public Function VerifyShipFits(ByVal enemyGrid As PlayerGrid, ByVal position As IGridCoord, ByVal SmallestShipSize As Byte) As Boolean
+Attribute VerifyShipFits.VB_Description = "Returns True if the smallest remaining ship could fit at the specified position."
     VerifyShipFits = FitsHorizontally(enemyGrid, position, SmallestShipSize) Or _
                      FitsVertically(enemyGrid, position, SmallestShipSize)
 End Function

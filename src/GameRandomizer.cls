@@ -7,7 +7,8 @@ Attribute VB_GlobalNameSpace = False
 Attribute VB_Creatable = False
 Attribute VB_PredeclaredId = True
 Attribute VB_Exposed = False
-'@Folder("Battleship")
+'@PredeclaredId
+'@Folder("Battleship.Model")
 
 'Private Const ThresholdNever As Single = 0
 Private Const ThresholdAlmostNever As Single = 0.1

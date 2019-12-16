@@ -1,7 +1,7 @@
 Attribute VB_Name = "PlayerGridTests"
 Attribute VB_Description = "Tests covering the Battleship.PlayerGrid class."
 '@Folder("Tests")
-'@Description("Tests covering the Battleship.PlayerGrid class.")
+'@ModuleDescription("Tests covering the Battleship.PlayerGrid class.")
 '@TestModule
 Option Explicit
 Option Private Module

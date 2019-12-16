@@ -8,8 +8,9 @@ Attribute VB_Creatable = False
 Attribute VB_PredeclaredId = True
 Attribute VB_Exposed = False
 Attribute VB_Description = "A configurable, deterministic, mock implementation of a randomizer."
+'@PredeclaredId
 '@Folder("Tests.Stubs")
-'@Description("A configurable, deterministic, mock implementation of a randomizer.")
+'@ModuleDescription("A configurable, deterministic, mock implementation of a randomizer.")
 Option Explicit
 Implements IRandomizer
 
