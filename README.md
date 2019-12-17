@@ -69,14 +69,10 @@ The ships (and their respective length) are:
 
 ### Sounds cool! Does it run on a Mac?
 
-It wasn't written with MacOS in mind, so there are `kernel32.dll` invokes to `Sleep` and `CopyMemory`, among others. Might work, might not, might blow up, I've no idea. I wouldn't try it on a Mac.
+Unfortunately, it won't, because of the Win32API calls used in the shape animations and `AIPlayer` delays.
 
 ## How do I contribute?
 
 If you find a bug, or have a feature request, you will want to [open an issue](https://github.com/rubberduck-vba/Battleship/issues/new).
 
 If you want to submit a [pull request](https://github.com/rubberduck-vba/Battleship/pulls) that closes an [open issue](https://github.com/rubberduck-vba/Battleship/issues), you'll need to fork the repository and work off a local clone of the files; open the `Battleship.xlsm` file in a desktop install of Microsoft Excel, load the VBE. Add new classes, new test modules and methods, new game modes, AI implementations, a new UI to play with, or enhancements to the `WorksheetView` - for best results, regularly export your files to the local git clone directory, *commit* the set of changes, *push* them to your fork, and make pull requests that focus on the feature it's for - if your pull request includes Rubberduck unit tests, it's even better!
-
-### Attributions
-
-This project is currently using the [VBA-tools/VBA-Dictionary](https://github.com/VBA-tools/VBA-Dictionary) by Tim Hall, in case there's any chance the game *might* run on a Mac.
