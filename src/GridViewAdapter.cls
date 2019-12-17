@@ -7,6 +7,8 @@ Attribute VB_GlobalNameSpace = False
 Attribute VB_Creatable = False
 Attribute VB_PredeclaredId = True
 Attribute VB_Exposed = True
+'@PredeclaredId
+'@Exposed
 '@Folder("Battleship.View")
 Option Explicit
 Implements IGridViewCommands
@@ -16,22 +18,22 @@ Public Enum ViewMode
     NewGame
     MessageShown
     FleetPosition
-    player1
-    player2
+    Player1
+    Player2
     GameOver
 End Enum
 
-Public Event OnCreatePlayer(ByVal gridId As Byte, ByVal pt As PlayerType, ByVal difficulty As AIDifficulty)
+Public Event OnCreatePlayer(ByVal gridId As PlayGridId, ByVal pt As PlayerType, ByVal difficulty As AIDifficulty)
 
-Public Event OnPreviewCurrentShipPosition(ByVal gridId As Byte, ByVal position As IGridCoord)
-Public Event OnRotateCurrentShipPosition(ByVal gridId As Byte, ByVal position As IGridCoord)
-Public Event OnConfirmCurrentShipPosition(ByVal gridId As Byte, ByVal position As IGridCoord)
+Public Event OnPreviewCurrentShipPosition(ByVal gridId As PlayGridId, ByVal position As IGridCoord)
+Public Event OnRotateCurrentShipPosition(ByVal gridId As PlayGridId, ByVal position As IGridCoord)
+Public Event OnConfirmCurrentShipPosition(ByVal gridId As PlayGridId, ByVal position As IGridCoord)
 
 Public Event OnPlayerReady()
 
-Public Event OnAttackPosition(ByVal gridId As Byte, ByVal position As IGridCoord)
-Public Event OnHit(ByVal gridId As Byte, ByVal position As IGridCoord, ByVal hitShip As IShip)
-Public Event OnMiss(ByVal gridId As Byte, ByVal position As IGridCoord)
+Public Event OnAttackPosition(ByVal gridId As PlayGridId, ByVal position As IGridCoord)
+Public Event OnHit(ByVal gridId As PlayGridId, ByVal position As IGridCoord, ByVal hitShip As IShip)
+Public Event OnMiss(ByVal gridId As PlayGridId, ByVal position As IGridCoord)
 
 Public Event OnGameOver(ByVal winner As IPlayer)
 
@@ -45,10 +47,10 @@ Private Sub Class_Initialize()
     this.ShipsToPosition = PlayerGrid.ShipsPerGrid
 End Sub
 
-Public Function Create(ByVal view As IGridViewCommands) As GridViewAdapter
+Public Function Create(ByVal View As IGridViewCommands) As GridViewAdapter
     With New GridViewAdapter
-        Set .GridView = view
-        Set view.Events = .Self
+        Set .GridView = View
+        Set View.Events = .Self
         Set Create = .Self
     End With
 End Function
@@ -59,6 +61,7 @@ End Property
 
 '@Description("Gets/sets a reference that exposes commands to send to the view.")
 Public Property Get GridView() As IGridViewCommands
+Attribute GridView.VB_Description = "Gets/sets a reference that exposes commands to send to the view."
     Set GridView = this.GridView
 End Property
 
@@ -75,15 +78,15 @@ End Sub
 ':Messages sent from the view
 ':***************************
 
-Private Sub IGridViewEvents_AttackPosition(ByVal gridId As Byte, ByVal position As IGridCoord)
+Private Sub IGridViewEvents_AttackPosition(ByVal gridId As PlayGridId, ByVal position As IGridCoord)
     RaiseEvent OnAttackPosition(gridId, position)
 End Sub
 
-Private Sub IGridViewEvents_ConfirmShipPosition(ByVal gridId As Byte, ByVal position As IGridCoord)
+Private Sub IGridViewEvents_ConfirmShipPosition(ByVal gridId As PlayGridId, ByVal position As IGridCoord)
     RaiseEvent OnConfirmCurrentShipPosition(gridId, position)
 End Sub
 
-Private Sub IGridViewEvents_CreatePlayer(ByVal gridId As Byte, ByVal pt As PlayerType, ByVal difficulty As AIDifficulty)
+Private Sub IGridViewEvents_CreatePlayer(ByVal gridId As PlayGridId, ByVal pt As PlayerType, ByVal difficulty As AIDifficulty)
     RaiseEvent OnCreatePlayer(gridId, pt, difficulty)
 End Sub
 
@@ -91,11 +94,11 @@ Private Sub IGridViewEvents_HumanPlayerReady()
     RaiseEvent OnPlayerReady
 End Sub
 
-Private Sub IGridViewEvents_PreviewRotateShip(ByVal gridId As Byte, ByVal position As IGridCoord)
+Private Sub IGridViewEvents_PreviewRotateShip(ByVal gridId As PlayGridId, ByVal position As IGridCoord)
     RaiseEvent OnRotateCurrentShipPosition(gridId, position)
 End Sub
 
-Private Sub IGridViewEvents_PreviewShipPosition(ByVal gridId As Byte, ByVal position As IGridCoord)
+Private Sub IGridViewEvents_PreviewShipPosition(ByVal gridId As PlayGridId, ByVal position As IGridCoord)
     RaiseEvent OnPreviewCurrentShipPosition(gridId, position)
 End Sub
 
@@ -112,13 +115,13 @@ Private Property Get IGridViewCommands_Events() As IGridViewEvents
     Set IGridViewCommands_Events = Me
 End Property
 
-Private Sub IGridViewCommands_OnBeginAttack(ByVal currentPlayerGridId As Byte)
+Private Sub IGridViewCommands_OnBeginAttack(ByVal currentPlayerGridId As PlayGridId)
     this.GridView.OnBeginAttack currentPlayerGridId
 End Sub
 
-Private Sub IGridViewCommands_OnBeginShipPosition(ByVal currentShip As IShip, ByVal player As IPlayer)
+Private Sub IGridViewCommands_OnBeginShipPosition(ByVal CurrentShip As IShip, ByVal player As IPlayer)
     this.GridView.OnLockGrid IIf(player.PlayGrid.gridId = 1, 2, 1)
-    this.GridView.OnBeginShipPosition currentShip, player
+    this.GridView.OnBeginShipPosition CurrentShip, player
 End Sub
 
 Private Sub IGridViewCommands_OnConfirmShipPosition(ByVal player As IPlayer, ByVal newShip As IShip)
@@ -127,12 +130,12 @@ Private Sub IGridViewCommands_OnConfirmShipPosition(ByVal player As IPlayer, ByV
     this.ShipsToPosition = this.ShipsToPosition - 1
 End Sub
 
-Private Sub IGridViewCommands_OnGameOver(ByVal winningGrid As Byte)
+Private Sub IGridViewCommands_OnGameOver(ByVal winningGrid As PlayGridId)
     this.GridView.OnGameOver winningGrid
     Set this.GridView.Events = Nothing
 End Sub
 
-Private Sub IGridViewCommands_OnHit(ByVal gridId As Byte)
+Private Sub IGridViewCommands_OnHit(ByVal gridId As PlayGridId)
     this.GridView.OnHit gridId
 End Sub
 
@@ -144,11 +147,11 @@ Private Sub IGridViewCommands_OnKnownPositionAttack()
     this.GridView.OnKnownPositionAttack
 End Sub
 
-Private Sub IGridViewCommands_OnLockGrid(ByVal gridId As Byte)
+Private Sub IGridViewCommands_OnLockGrid(ByVal gridId As PlayGridId)
     this.GridView.OnLockGrid gridId
 End Sub
 
-Private Sub IGridViewCommands_OnMiss(ByVal gridId As Byte)
+Private Sub IGridViewCommands_OnMiss(ByVal gridId As PlayGridId)
     this.GridView.OnMiss gridId
 End Sub
 
@@ -165,11 +168,11 @@ Private Sub IGridViewCommands_OnRefreshGrid(ByVal grid As PlayerGrid)
     this.GridView.OnRefreshGrid grid
 End Sub
 
-Private Sub IGridViewCommands_OnSelectPosition(ByVal gridId As Byte, ByVal position As IGridCoord)
+Private Sub IGridViewCommands_OnSelectPosition(ByVal gridId As PlayGridId, ByVal position As IGridCoord)
     this.GridView.OnSelectPosition gridId, position
 End Sub
 
-Private Sub IGridViewCommands_OnSink(ByVal gridId As Byte)
+Private Sub IGridViewCommands_OnSink(ByVal gridId As PlayGridId)
     this.GridView.OnSink gridId
 End Sub
 

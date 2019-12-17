@@ -7,14 +7,16 @@ Attribute VB_GlobalNameSpace = False
 Attribute VB_Creatable = False
 Attribute VB_PredeclaredId = True
 Attribute VB_Exposed = False
-'@Folder("Battleship.Model.Player")
+Attribute VB_Description = "An implementation of IPlayer that is AI-controlled."
+'@Folder("Battleship.Model")
+'@ModuleDescription("An implementation of IPlayer that is AI-controlled.")
+'@PredeclaredId
 Option Explicit
 Implements IPlayer
 
 Private Const Delay As Long = 800
 
 Private Type TPlayer
-    GridIndex As Byte
     PlayerType As PlayerType
     PlayGrid As PlayerGrid
     Strategy As IGameStrategy
@@ -22,12 +24,11 @@ End Type
 
 Private this As TPlayer
 
-Public Function Create(ByVal gridId As Byte, ByVal GameStrategy As IGameStrategy) As IPlayer
+Public Function Create(ByVal grid As PlayerGrid, ByVal GameStrategy As IGameStrategy) As IPlayer
     With New AIPlayer
         .PlayerType = ComputerControlled
-        .GridIndex = gridId
         Set .Strategy = GameStrategy
-        Set .PlayGrid = PlayerGrid.Create(gridId)
+        Set .PlayGrid = grid
         Set Create = .Self
     End With
 End Function
@@ -52,14 +53,6 @@ Public Property Set PlayGrid(ByVal value As PlayerGrid)
     Set this.PlayGrid = value
 End Property
 
-Public Property Get GridIndex() As Byte
-    GridIndex = this.GridIndex
-End Property
-
-Public Property Let GridIndex(ByVal value As Byte)
-    this.GridIndex = value
-End Property
-
 Public Property Get PlayerType() As PlayerType
     PlayerType = this.PlayerType
 End Property
@@ -72,19 +65,21 @@ Private Property Get IPlayer_PlayGrid() As PlayerGrid
     Set IPlayer_PlayGrid = this.PlayGrid
 End Property
 
-Private Sub IPlayer_PlaceShip(ByVal currentShip As IShip)
-    this.Strategy.PlaceShip this.PlayGrid, currentShip
+Private Sub IPlayer_PlaceShip(ByVal CurrentShip As IShip)
+    this.Strategy.PlaceShip this.PlayGrid, CurrentShip
 End Sub
 
 Private Function IPlayer_Play(ByVal enemyGrid As PlayerGrid) As IGridCoord
+    
     Win32API.Sleep Delay
+    Set IPlayer_Play = this.Strategy.Play(enemyGrid)
+    
     Static shots As Long
     shots = shots + 1
-    Set IPlayer_Play = this.Strategy.Play(enemyGrid)
-    Debug.Print "AI Player " & this.GridIndex & "(" & TypeName(this.Strategy) & ") has played " & shots & " turns"
+    Debug.Print "AI Player " & this.PlayGrid.gridId & "(" & TypeName(this.Strategy) & ") has played " & shots & " turns"
+    
 End Function
 
 Private Property Get IPlayer_PlayerType() As PlayerType
     IPlayer_PlayerType = this.PlayerType
 End Property
-

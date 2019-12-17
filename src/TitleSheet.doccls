@@ -1,17 +1,14 @@
 ﻿'@Folder("Excel Objects")
-'@Description("Interaction logic for the Battleship.TitleSheet worksheet module.")
 Option Explicit
 
 Private Property Get MacrosDisabledMessage() As Shape
     Set MacrosDisabledMessage = Me.Shapes("MacrosDisabledMessage")
 End Property
 
-'@Description("A local macro that hides a warning panel if macros are disabled.")
 Public Sub HideMacrosDisabledWarning()
     MacrosDisabledMessage.Visible = msoFalse
 End Sub
 
-'@Description("A local macro that shows a warning panel if macros are disabled.")
 Public Sub ShowMacrosDisabledWarning()
     MacrosDisabledMessage.Visible = msoTrue
 End Sub

@@ -1,7 +1,7 @@
 Attribute VB_Name = "ShipTests"
 Attribute VB_Description = "Tests covering the Battleship.Ship class."
 '@Folder("Tests")
-'@Description("Tests covering the Battleship.Ship class.")
+'@ModuleDescription("Tests covering the Battleship.Ship class.")
 '@TestModule
 Option Explicit
 Option Private Module

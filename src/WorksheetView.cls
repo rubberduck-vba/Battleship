@@ -9,7 +9,7 @@ Attribute VB_PredeclaredId = False
 Attribute VB_Exposed = False
 Attribute VB_Description = "Facade implementation for a Worksheet-based user interface."
 '@Folder("Battleship.View.Worksheet")
-'@Description("Facade implementation for a Worksheet-based user interface.")
+'@ModuleDescription("Facade implementation for a Worksheet-based user interface.")
 Option Explicit
 Implements IGridViewCommands
 
@@ -34,17 +34,17 @@ End Property
 ':Messages sent from the view
 ':***************************
 
-Private Sub sheetUI_CreatePlayer(ByVal gridId As Byte, ByVal pt As PlayerType, ByVal difficulty As AIDifficulty)
+Private Sub sheetUI_CreatePlayer(ByVal gridId As PlayGridId, ByVal pt As PlayerType, ByVal difficulty As AIDifficulty)
     ViewEvents.CreatePlayer gridId, pt, difficulty
 End Sub
 
-Private Sub sheetUI_DoubleClick(ByVal gridId As Byte, ByVal position As IGridCoord, ByVal Mode As ViewMode)
+Private Sub sheetUI_DoubleClick(ByVal gridId As PlayGridId, ByVal position As IGridCoord, ByVal Mode As ViewMode)
     Select Case Mode
         
         Case ViewMode.FleetPosition
             ViewEvents.ConfirmShipPosition gridId, position
             
-        Case ViewMode.player1, ViewMode.player2
+        Case ViewMode.Player1, ViewMode.Player2
             ViewEvents.AttackPosition gridId, position
             
     End Select
@@ -54,11 +54,11 @@ Private Sub sheetUI_PlayerReady()
     ViewEvents.HumanPlayerReady
 End Sub
 
-Private Sub sheetUI_RightClick(ByVal gridId As Byte, ByVal position As IGridCoord, ByVal Mode As ViewMode)
+Private Sub sheetUI_RightClick(ByVal gridId As PlayGridId, ByVal position As IGridCoord, ByVal Mode As ViewMode)
     If Mode = FleetPosition Then ViewEvents.PreviewRotateShip gridId, position
 End Sub
 
-Private Sub sheetUI_SelectionChange(ByVal gridId As Byte, ByVal position As IGridCoord, ByVal Mode As ViewMode)
+Private Sub sheetUI_SelectionChange(ByVal gridId As PlayGridId, ByVal position As IGridCoord, ByVal Mode As ViewMode)
     If Mode = FleetPosition Then ViewEvents.PreviewShipPosition gridId, position
 End Sub
 
@@ -75,12 +75,12 @@ Private Property Get IGridViewCommands_Events() As IGridViewEvents
     Set IGridViewCommands_Events = adapter '.Object
 End Property
 
-Private Sub IGridViewCommands_OnBeginAttack(ByVal currentPlayerGridId As Byte)
+Private Sub IGridViewCommands_OnBeginAttack(ByVal currentPlayerGridId As PlayGridId)
     sheetUI.ShowInfoBeginAttackPhase currentPlayerGridId
 End Sub
 
-Private Sub IGridViewCommands_OnBeginShipPosition(ByVal currentShip As IShip, ByVal player As IPlayer)
-    sheetUI.ShowInfoBeginDeployShip currentShip.Name
+Private Sub IGridViewCommands_OnBeginShipPosition(ByVal CurrentShip As IShip, ByVal player As IPlayer)
+    sheetUI.ShowInfoBeginDeployShip CurrentShip.Name
 End Sub
 
 Private Sub IGridViewCommands_OnBeginWaitForComputerPlayer()
@@ -97,7 +97,7 @@ Private Sub IGridViewCommands_OnConfirmShipPosition(ByVal player As IPlayer, ByV
     sheetUI.ConfirmShipPosition player, newShip
 End Sub
     
-Private Sub IGridViewCommands_OnGameOver(ByVal winningGridId As Byte)
+Private Sub IGridViewCommands_OnGameOver(ByVal winningGridId As PlayGridId)
     With sheetUI
         .ShowAnimationVictory winningGridId
         .ShowAnimationDefeat IIf(winningGridId = 1, 2, 1)
@@ -107,7 +107,7 @@ Private Sub IGridViewCommands_OnGameOver(ByVal winningGridId As Byte)
     Application.Cursor = xlDefault
 End Sub
 
-Private Sub IGridViewCommands_OnHit(ByVal gridId As Byte)
+Private Sub IGridViewCommands_OnHit(ByVal gridId As PlayGridId)
     With sheetUI
         .ShowAnimationHit gridId
         .LockGrid gridId
@@ -122,11 +122,11 @@ Private Sub IGridViewCommands_OnKnownPositionAttack()
     sheetUI.ShowErrorKnownPositionAttack
 End Sub
 
-Private Sub IGridViewCommands_OnLockGrid(ByVal gridId As Byte)
+Private Sub IGridViewCommands_OnLockGrid(ByVal gridId As PlayGridId)
     sheetUI.LockGrid gridId
 End Sub
 
-Private Sub IGridViewCommands_OnMiss(ByVal gridId As Byte)
+Private Sub IGridViewCommands_OnMiss(ByVal gridId As PlayGridId)
     With sheetUI
         .ShowAnimationMiss gridId
         .LockGrid gridId
@@ -148,13 +148,13 @@ Private Sub IGridViewCommands_OnRefreshGrid(ByVal grid As PlayerGrid)
     sheetUI.RefreshGrid grid
 End Sub
 
-Private Sub IGridViewCommands_OnSelectPosition(ByVal gridId As Byte, ByVal position As IGridCoord)
+Private Sub IGridViewCommands_OnSelectPosition(ByVal gridId As PlayGridId, ByVal position As IGridCoord)
     If sheetUI Is Application.ActiveSheet Then
         sheetUI.GridCoordToRange(gridId, position).Select
     End If
 End Sub
 
-Private Sub IGridViewCommands_OnSink(ByVal gridId As Byte)
+Private Sub IGridViewCommands_OnSink(ByVal gridId As PlayGridId)
     With sheetUI
         .ShowAnimationSunk gridId
         .LockGrid gridId

@@ -7,8 +7,10 @@ Attribute VB_GlobalNameSpace = False
 Attribute VB_Creatable = False
 Attribute VB_PredeclaredId = True
 Attribute VB_Exposed = False
-'@Folder("Battleship.AI")
-'@Description("A strategy that deploys ships more carefully, and attacks in patterns.")
+Attribute VB_Description = "A strategy that deploys ships more carefully, and attacks in patterns."
+'@PredeclaredId
+'@Folder("Battleship.Model.AI")
+'@ModuleDescription("A strategy that deploys ships more carefully, and attacks in patterns.")
 Option Explicit
 Implements IGameStrategy
 
@@ -49,14 +51,14 @@ Private Sub Class_Initialize()
     Set base = New GameStrategyBase
 End Sub
 
-Private Sub IGameStrategy_PlaceShip(ByVal grid As PlayerGrid, ByVal currentShip As IShip)
+Private Sub IGameStrategy_PlaceShip(ByVal grid As PlayerGrid, ByVal CurrentShip As IShip)
     Do
         Dim direction As ShipOrientation
         Dim position As IGridCoord
-        Set position = base.PlaceShip(Random, grid, currentShip, direction)
-    Loop Until Not grid.HasAdjacentShip(position, direction, currentShip.Size) Or Random.Maybe(AlmostNever)
+        Set position = base.PlaceShip(Random, grid, CurrentShip, direction)
+    Loop Until Not grid.HasAdjacentShip(position, direction, CurrentShip.Size) Or Random.Maybe(AlmostNever)
     
-    grid.AddShip Ship.Create(currentShip.ShipKind, direction, position)
+    grid.AddShip Ship.Create(CurrentShip.ShipKind, direction, position)
     If grid.shipCount = PlayerGrid.ShipsPerGrid Then grid.Scramble
 End Sub
 
@@ -215,4 +217,5 @@ Private Function AvoidAdjacentHitPosition(ByVal enemyGrid As PlayerGrid, ByVal p
     End If
     AvoidAdjacentHitPosition = allowPosition
 End Function
+
 

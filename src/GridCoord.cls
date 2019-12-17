@@ -7,8 +7,12 @@ Attribute VB_GlobalNameSpace = False
 Attribute VB_Creatable = False
 Attribute VB_PredeclaredId = True
 Attribute VB_Exposed = True
-'@Folder("Battleship.Model.Grid")
-'@IgnoreModule UseMeaningfulName; X and Y are perfectly fine names here.
+Attribute VB_Description = "An object representing a 2D grid coordinate."
+'@Folder("Battleship.Model")
+'@ModuleDescription("An object representing a 2D grid coordinate.")
+'@PredeclaredId
+'@Exposed
+'@IgnoreModule UseMeaningfulName: X and Y are perfectly fine names in this context.
 Option Explicit
 Implements IGridCoord
 

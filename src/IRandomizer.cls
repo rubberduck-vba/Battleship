@@ -6,8 +6,8 @@ Attribute VB_Name = "IRandomizer"
 Attribute VB_GlobalNameSpace = False
 Attribute VB_Creatable = False
 Attribute VB_PredeclaredId = False
-Attribute VB_Exposed = False
-'@Folder("Battleship")
+Attribute VB_Exposed = True
+'@Folder("Battleship.Model.Abstract")
 '@Interface
 Option Explicit
 

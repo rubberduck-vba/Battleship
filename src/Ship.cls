@@ -8,8 +8,9 @@ Attribute VB_Creatable = False
 Attribute VB_PredeclaredId = True
 Attribute VB_Exposed = False
 Attribute VB_Description = "Default instance factory; avoid altering default instance state."
-'@Folder("Battleship.Model.Ship")
-'@Description("Default instance factory; avoid altering default instance state.")
+'@PredeclaredId
+'@Folder("Battleship.Model")
+'@ModuleDescription "Default instance factory; avoid altering default instance state."
 Option Explicit
 
 Private ShipSizes As Dictionary
@@ -35,6 +36,7 @@ Implements IShip
 
 '@Description("Populates and returns a dictionary associating all ship names with their respective size.")
 Public Function Fleet() As Dictionary
+Attribute Fleet.VB_Description = "Populates and returns a dictionary associating all ship names with their respective size."
     Dim Names As Variant
     Names = shipNames.Items
     
@@ -52,16 +54,19 @@ End Function
 
 '@Description("Gets an array of all valid ShipKind enum values.")
 Public Function ShipKinds() As Variant
+Attribute ShipKinds.VB_Description = "Gets an array of all valid ShipKind enum values."
     ShipKinds = shipNames.Keys
 End Function
 
 '@Description("Gets an array of all ship names.")
 Public Function Names() As Variant
+Attribute Names.VB_Description = "Gets an array of all ship names."
     Names = shipNames.Items
 End Function
 
 '@Description("Use from the class' default instance to create a new ship instance using parameters.")
 Public Function Create(ByVal kind As ShipType, ByVal direction As ShipOrientation, ByVal position As IGridCoord) As Ship
+Attribute Create.VB_Description = "Use from the class' default instance to create a new ship instance using parameters."
     ValidateInputs kind, direction, position
     With New Ship
         .ShipKind = kind
@@ -78,7 +83,7 @@ Public Function Create(ByVal kind As ShipType, ByVal direction As ShipOrientatio
             currentPoint.Y = position.Y + IIf(direction = Vertical, Offset, 0)
             
             ' each element is a Boolean, keyed with a grid coordinate:
-            .State.Add Item:=False, Key:=currentPoint.ToString
+            .State.Add Item:=False, key:=currentPoint.ToString
         Next
         Set Create = .Self
     End With
@@ -254,4 +259,6 @@ End Property
 Private Property Get IShip_StateArray() As Variant
     IShip_StateArray = this.State.Items
 End Property
+
+
 

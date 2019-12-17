@@ -8,8 +8,10 @@ Attribute VB_Creatable = False
 Attribute VB_PredeclaredId = True
 Attribute VB_Exposed = True
 Attribute VB_Description = "Default instance factory; avoid altering default instance state."
-'@Folder("Battleship.Win32")
-'@Description("Default instance factory; avoid altering default instance state.")
+'@PredeclaredId
+'@Exposed
+'@Folder("Win32")
+'@ModuleDescription("Default instance factory; avoid altering default instance state.")
 Option Explicit
 Implements IWeakReference
 
@@ -19,7 +21,6 @@ Private Declare PtrSafe Sub CopyMemory Lib "kernel32.dll" Alias "RtlMoveMemory" 
 Private Declare Sub CopyMemory Lib "kernel32.dll" Alias "RtlMoveMemory" (hpvDest As Any, hpvSource As Any, ByVal cbCopy As Long)
 #End If
 
-'@Description("Describes the instance-level state.")
 Private Type TReference
 #If VBA7 Then
     Address As LongPtr
@@ -28,11 +29,11 @@ Private Type TReference
 #End If
 End Type
 
-'@Description("Encapsulates the instance-level state.")
 Private this As TReference
 
 '@Description("Default instance factory method.")
 Public Function Create(ByVal instance As Object) As IWeakReference
+Attribute Create.VB_Description = "Default instance factory method."
     With New WeakReference
         .Address = ObjPtr(instance)
         Set Create = .Self
