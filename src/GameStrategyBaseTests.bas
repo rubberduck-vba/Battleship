@@ -21,7 +21,7 @@ Public Sub ModuleCleanup()
     'Set Fakes = Nothing
 End Sub
 
-'@TestMethod
+'@TestMethod("GameStrategyBase")
 Public Sub VerifyShipFits_TrueGivenEmptyGrid()
     Dim grid As PlayerGrid
     Set grid = PlayerGrid.Create(1)
@@ -32,7 +32,7 @@ Public Sub VerifyShipFits_TrueGivenEmptyGrid()
     Assert.IsTrue sut.VerifyShipFits(grid, GridCoord.Create(1, 1), 5)
 End Sub
 
-'@TestMethod
+'@TestMethod("GameStrategyBase")
 Public Sub VerifyShipFits_FalseGivenPreviousMissesAroundTarget()
     Dim grid As PlayerGrid
     Set grid = PlayerGrid.Create(1)
@@ -59,7 +59,7 @@ Public Sub VerifyShipFits_FalseGivenPreviousMissesAroundTarget()
     
 End Sub
 
-'@TestMethod
+'@TestMethod("GameStrategyBase")
 Public Sub VerifyShipFits_TrueGivenEnoughHorizontalUnknownState()
     Dim grid As PlayerGrid
     Set grid = PlayerGrid.Create(1)
@@ -80,7 +80,7 @@ Public Sub VerifyShipFits_TrueGivenEnoughHorizontalUnknownState()
     
 End Sub
 
-'@TestMethod
+'@TestMethod("GameStrategyBase")
 Public Sub VerifyShipFits_TrueGivenEnoughVerticalUnknownState()
     Dim grid As PlayerGrid
     Set grid = PlayerGrid.Create(1)
@@ -101,7 +101,7 @@ Public Sub VerifyShipFits_TrueGivenEnoughVerticalUnknownState()
     
 End Sub
 
-'@TestMethod
+'@TestMethod("GameStrategyBase")
 Public Sub VerifyShipFits_FalseGivenHorizontalEdgeOfGrid()
     Dim grid As PlayerGrid
     Set grid = PlayerGrid.Create(1)
@@ -128,7 +128,7 @@ Public Sub VerifyShipFits_FalseGivenHorizontalEdgeOfGrid()
     
 End Sub
 
-'@TestMethod
+'@TestMethod("GameStrategyBase")
 Public Sub VerifyShipFits_FalseGivenVerticalEdgeOfGrid()
     Dim grid As PlayerGrid
     Set grid = PlayerGrid.Create(1)
@@ -155,7 +155,7 @@ Public Sub VerifyShipFits_FalseGivenVerticalEdgeOfGrid()
     
 End Sub
 
-'@TestMethod
+'@TestMethod("GameStrategyBase")
 Public Sub VerifyShipFits_TrueGivenAdjacentHitArea()
     Dim grid As PlayerGrid
     Set grid = PlayerGrid.Create(1)
@@ -194,7 +194,7 @@ Public Sub VerifyShipFits_TrueGivenAdjacentHitArea()
     
 End Sub
 
-'@TestMethod
+'@TestMethod("GameStrategyBase")
 Public Sub IsLegalPosition_TrueGivenUnknownStatePositionInsideGrid()
     Dim grid As PlayerGrid
     Set grid = PlayerGrid.Create(1)
@@ -207,7 +207,7 @@ Public Sub IsLegalPosition_TrueGivenUnknownStatePositionInsideGrid()
     Assert.IsTrue sut.IsLegalPosition(grid, position)
 End Sub
 
-'@TestMethod
+'@TestMethod("GameStrategyBase")
 Public Sub IsLegalPosition_FalseGivenKnownHitWithPositionInsideGrid()
     Dim grid As PlayerGrid
     Set grid = PlayerGrid.Create(1)
@@ -228,7 +228,7 @@ Public Sub IsLegalPosition_FalseGivenKnownHitWithPositionInsideGrid()
     
 End Sub
 
-'@TestMethod
+'@TestMethod("GameStrategyBase")
 Public Sub IsLegalPosition_FalseGivenKnownMissWithPositionInsideGrid()
     Dim grid As PlayerGrid
     Set grid = PlayerGrid.Create(1)
@@ -246,7 +246,7 @@ Public Sub IsLegalPosition_FalseGivenKnownMissWithPositionInsideGrid()
     
 End Sub
 
-'@TestMethod
+'@TestMethod("GameStrategyBase")
 Public Sub IsLegalPosition_FalseGivenOutsideGrid()
     Dim grid As PlayerGrid
     Set grid = PlayerGrid.Create(1)

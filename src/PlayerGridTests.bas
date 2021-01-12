@@ -21,7 +21,7 @@ Public Sub ModuleCleanup()
     'Set Fakes = Nothing
 End Sub
 
-'@TestMethod
+'@TestMethod("PlayerGrid")
 Public Sub CanAddShipInsideGridBoundaries_ReturnsTrue()
     Dim position As GridCoord
     Set position = GridCoord.Create(1, 1)
@@ -32,7 +32,7 @@ Public Sub CanAddShipInsideGridBoundaries_ReturnsTrue()
     Assert.IsTrue sut.CanAddShip(position, Horizontal, 2)
 End Sub
 
-'@TestMethod
+'@TestMethod("PlayerGrid")
 Public Sub CanAddShipAtPositionZeroZero_ReturnsFalse()
 'i.e. PlayerGrid coordinates are 1-based
     Dim position As GridCoord
@@ -44,7 +44,7 @@ Public Sub CanAddShipAtPositionZeroZero_ReturnsFalse()
     Assert.IsFalse sut.CanAddShip(position, Horizontal, 2)
 End Sub
 
-'@TestMethod
+'@TestMethod("PlayerGrid")
 Public Sub CanAddShipGivenInterectingShips_ReturnsFalse()
     Dim Ship1 As IShip
     Set Ship1 = Ship.Create(ShipType.Battleship, Horizontal, GridCoord.Create(1, 1))
@@ -59,7 +59,7 @@ Public Sub CanAddShipGivenInterectingShips_ReturnsFalse()
     Assert.IsFalse sut.CanAddShip(Ship2.GridPosition, Ship2.Orientation, Ship2.Size)
 End Sub
 
-'@TestMethod
+'@TestMethod("PlayerGrid")
 Public Sub AddingSameShipTypeTwice_Throws()
     Const ExpectedError As Long = 457 ' "This key is already associated with an element of this collection"
     On Error GoTo TestFail
@@ -89,7 +89,7 @@ TestFail:
     End If
 End Sub
 
-'@TestMethod
+'@TestMethod("PlayerGrid")
 Public Sub AddingShipOutsideGridBoundaries_Throws()
     Const ExpectedError As Long = PlayerGridErrors.CannotAddShipAtPosition
     On Error GoTo TestFail
@@ -115,7 +115,7 @@ TestFail:
     End If
 End Sub
 
-'@TestMethod
+'@TestMethod("PlayerGrid")
 Public Sub TryHitKnownState_Throws()
     Const ExpectedError As Long = PlayerGridErrors.KnownGridStateError
     On Error GoTo TestFail
@@ -143,7 +143,7 @@ TestFail:
     End If
 End Sub
 
-'@TestMethod
+'@TestMethod("PlayerGrid")
 Public Sub TryHitMiss_SetsPreviousMissState()
     Const expected = GridState.PreviousMiss
     
@@ -163,7 +163,7 @@ Public Sub TryHitMiss_SetsPreviousMissState()
     Assert.AreEqual expected, actual
 End Sub
 
-'@TestMethod
+'@TestMethod("PlayerGrid")
 Public Sub TryHitSuccess_SetsPreviousHitState()
     Const expected = GridState.PreviousHit
     
@@ -180,7 +180,7 @@ Public Sub TryHitSuccess_SetsPreviousHitState()
     Assert.AreEqual expected, actual
 End Sub
 
-'@TestMethod
+'@TestMethod("PlayerGrid")
 Public Sub TryHitSuccess_ReturnsHit()
     Dim position As GridCoord
     Set position = GridCoord.Create(1, 1)
@@ -192,7 +192,7 @@ Public Sub TryHitSuccess_ReturnsHit()
     Assert.AreEqual AttackResult.Hit, sut.TryHit(position)
 End Sub
 
-'@TestMethod
+'@TestMethod("PlayerGrid")
 Public Sub TryHitMisses_ReturnsMiss()
     Dim position As IGridCoord
     Set position = GridCoord.Create(1, 1)
@@ -207,7 +207,7 @@ Public Sub TryHitMisses_ReturnsMiss()
     Assert.AreEqual AttackResult.Miss, sut.TryHit(badPosition)
 End Sub
 
-'@TestMethod
+'@TestMethod("PlayerGrid")
 Public Sub GridInitialState_UnknownState()
     Const expected = GridState.Unknown
     
@@ -220,7 +220,7 @@ Public Sub GridInitialState_UnknownState()
     Assert.AreEqual expected, actual
 End Sub
 
-'@TestMethod
+'@TestMethod("PlayerGrid")
 Public Sub GivenAdjacentShip_HasRightAdjacentShipReturnsTrue()
     Dim position As GridCoord
     Set position = GridCoord.Create(2, 2)
@@ -233,7 +233,7 @@ Public Sub GivenAdjacentShip_HasRightAdjacentShipReturnsTrue()
     Assert.IsTrue sut.HasAdjacentShip(GridCoord.Create(1, 2), Vertical, 3)
 End Sub
 
-'@TestMethod
+'@TestMethod("PlayerGrid")
 Public Sub GivenAdjacentShip_HasLeftAdjacentShipReturnsTrue()
     Dim position As GridCoord
     Set position = GridCoord.Create(2, 1)
@@ -246,7 +246,7 @@ Public Sub GivenAdjacentShip_HasLeftAdjacentShipReturnsTrue()
     Assert.IsTrue sut.HasAdjacentShip(GridCoord.Create(1, 1), Vertical, 3)
 End Sub
 
-'@TestMethod
+'@TestMethod("PlayerGrid")
 Public Sub GivenAdjacentShip_HasDownAdjacentShipReturnsTrue()
     Dim position As GridCoord
     Set position = GridCoord.Create(2, 2)
@@ -259,7 +259,7 @@ Public Sub GivenAdjacentShip_HasDownAdjacentShipReturnsTrue()
     Assert.IsTrue sut.HasAdjacentShip(GridCoord.Create(1, 3), Horizontal, 3)
 End Sub
 
-'@TestMethod
+'@TestMethod("PlayerGrid")
 Public Sub GivenAdjacentShip_HasUpAdjacentShipReturnsTrue()
     Dim position As GridCoord
     Set position = GridCoord.Create(2, 2)
@@ -272,7 +272,7 @@ Public Sub GivenAdjacentShip_HasUpAdjacentShipReturnsTrue()
     Assert.IsTrue sut.HasAdjacentShip(GridCoord.Create(1, 1), Horizontal, 3)
 End Sub
 
-'@TestMethod
+'@TestMethod("PlayerGrid")
 Public Sub GivenAdjacentShipAtHorizontalTipEnd_ReturnsTrue()
     Dim position As GridCoord
     Set position = GridCoord.Create(10, 4)
@@ -285,7 +285,7 @@ Public Sub GivenAdjacentShipAtHorizontalTipEnd_ReturnsTrue()
     Assert.IsTrue sut.HasAdjacentShip(GridCoord.Create(6, 7), Horizontal, 4)
 End Sub
 
-'@TestMethod
+'@TestMethod("PlayerGrid")
 Public Sub GivenAdjacentShipAtVerticalTipEnd_ReturnsTrue()
     Dim position As GridCoord
     Set position = GridCoord.Create(6, 7)
@@ -298,7 +298,7 @@ Public Sub GivenAdjacentShipAtVerticalTipEnd_ReturnsTrue()
     Assert.IsTrue sut.HasAdjacentShip(GridCoord.Create(10, 4), Vertical, 5)
 End Sub
 
-'@TestMethod
+'@TestMethod("PlayerGrid")
 Public Sub GivenTwoSideBySideHits_GetHitAreaReturnsTwoItems()
 
     Const expected As Long = 2

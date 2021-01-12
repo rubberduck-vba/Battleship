@@ -29,7 +29,7 @@ End Sub
 Public Sub TestCleanup()
 End Sub
 
-'@TestMethod
+'@TestMethod("Ship")
 Public Sub CreatesShipOfSpecifiedType()
     Dim expected As ShipType
     expected = ShipType.Battleship
@@ -43,7 +43,7 @@ Public Sub CreatesShipOfSpecifiedType()
     Assert.AreEqual expected, actual
 End Sub
 
-'@TestMethod
+'@TestMethod("Ship")
 Public Sub SuccessfulHit_SetsStateToTrue()
     Dim position As IGridCoord
     Set position = GridCoord.Default
@@ -61,7 +61,7 @@ Public Sub SuccessfulHit_SetsStateToTrue()
     Assert.IsTrue obj.State(position.ToString)
 End Sub
 
-'@TestMethod
+'@TestMethod("Ship")
 Public Sub SunkenShip_IsSunken()
     Dim position As IGridCoord
     Set position = GridCoord.Default
@@ -82,7 +82,7 @@ Public Sub SunkenShip_IsSunken()
     Assert.IsTrue sut.IsSunken
 End Sub
 
-'@TestMethod
+'@TestMethod("Ship")
 Public Sub MissedHit_ReturnsFalse()
     Dim position As IGridCoord
     Set position = GridCoord.Default
@@ -101,7 +101,7 @@ Public Sub MissedHit_ReturnsFalse()
     Assert.IsFalse sut.Hit(target)
 End Sub
 
-'@TestMethod
+'@TestMethod("Ship")
 Public Sub SuccessfulHit_ReturnsTrue()
     Dim position As GridCoord
     Set position = GridCoord.Default
@@ -115,7 +115,7 @@ Public Sub SuccessfulHit_ReturnsTrue()
     Assert.IsTrue sut.Hit(position)
 End Sub
 
-'@TestMethod
+'@TestMethod("Ship")
 Public Sub ShipOrientationInvalidEnumValue_Throws()
     
     Const ExpectedError As Long = 5
@@ -145,7 +145,7 @@ TestFail:
     End If
 End Sub
 
-'@TestMethod
+'@TestMethod("Ship")
 Public Sub IntersectingShip_IntersectReturnsGridCoord()
     Dim Ship1 As IShip
     Set Ship1 = Ship.Create(ShipType.Battleship, Horizontal, GridCoord.Default)
@@ -156,7 +156,7 @@ Public Sub IntersectingShip_IntersectReturnsGridCoord()
     Assert.IsNotNothing Ship1.Intersects(Ship2.Size, Ship2.Orientation, Ship2.GridPosition)
 End Sub
 
-'@TestMethod
+'@TestMethod("Ship")
 Public Sub NonIntersectingShip_IntersectReturnsNothing()
     Dim Ship1 As IShip
     Set Ship1 = Ship.Create(ShipType.Battleship, Horizontal, GridCoord.Default)

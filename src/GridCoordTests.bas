@@ -21,7 +21,7 @@ Public Sub ModuleCleanup()
     'Set Fakes = Nothing
 End Sub
 
-'@TestMethod
+'@TestMethod("GridCoord")
 Public Sub CreatesAtSpecifiedXCoordinate()
     Const expectedX As Long = 42
     Const expectedY As Long = 74
@@ -33,7 +33,7 @@ Public Sub CreatesAtSpecifiedXCoordinate()
     Assert.AreEqual expectedY, sut.Y, "Y coordinate mismatched."
 End Sub
 
-'@TestMethod
+'@TestMethod("GridCoord")
 Public Sub DefaultIsZeroAndZero()
     Const expectedX As Long = 0
     Const expectedY As Long = 0
@@ -45,7 +45,7 @@ Public Sub DefaultIsZeroAndZero()
     Assert.AreEqual expectedY, sut.Y, "Y coordinate mismatched."
 End Sub
 
-'@TestMethod
+'@TestMethod("GridCoord")
 Public Sub OffsetAddsX()
     Const xOffset As Long = 1
     Const yOffset As Long = 0
@@ -62,7 +62,7 @@ Public Sub OffsetAddsX()
     Assert.AreEqual initial.X + xOffset, actual.X
 End Sub
 
-'@TestMethod
+'@TestMethod("GridCoord")
 Public Sub OffsetAddsY()
     Const xOffset As Long = 0
     Const yOffset As Long = 1
@@ -79,7 +79,7 @@ Public Sub OffsetAddsY()
     Assert.AreEqual initial.Y + yOffset, actual.Y
 End Sub
 
-'@TestMethod
+'@TestMethod("GridCoord")
 Public Sub FromToString_RoundTrips()
     Dim initial As IGridCoord
     Set initial = GridCoord.Default
@@ -94,7 +94,7 @@ Public Sub FromToString_RoundTrips()
     Assert.AreEqual initial.Y, sut.Y, "Y coordinate mismatched."
 End Sub
 
-'@TestMethod
+'@TestMethod("GridCoord")
 Public Sub ToStringFormat_NoSpaceCommaSeparatedInParentheses()
     Dim sut As IGridCoord
     Set sut = GridCoord.Default
@@ -108,7 +108,7 @@ Public Sub ToStringFormat_NoSpaceCommaSeparatedInParentheses()
     Assert.AreEqual expected, actual
 End Sub
 
-'@TestMethod
+'@TestMethod("GridCoord")
 Public Sub EqualsReturnsTrueForMatchingCoords()
     Dim other As IGridCoord
     Set other = GridCoord.Default
@@ -119,7 +119,7 @@ Public Sub EqualsReturnsTrueForMatchingCoords()
     Assert.IsTrue sut.Equals(other)
 End Sub
 
-'@TestMethod
+'@TestMethod("GridCoord")
 Public Sub EqualsReturnsFalseForMismatchingCoords()
     Dim other As IGridCoord
     Set other = GridCoord.Default.Offset(1)
@@ -130,7 +130,7 @@ Public Sub EqualsReturnsFalseForMismatchingCoords()
     Assert.IsFalse sut.Equals(other)
 End Sub
 
-'@TestMethod
+'@TestMethod("GridCoord")
 Public Sub GivenOneLeftAndSameY_IsAdjacentReturnsTrue()
     Dim other As IGridCoord
     Set other = GridCoord.Create(1, 1)
@@ -141,7 +141,7 @@ Public Sub GivenOneLeftAndSameY_IsAdjacentReturnsTrue()
     Assert.IsTrue sut.IsAdjacent(other)
 End Sub
 
-'@TestMethod
+'@TestMethod("GridCoord")
 Public Sub GivenTwoLeftAndSameY_IsAdjacentReturnsFalse()
     Dim other As IGridCoord
     Set other = GridCoord.Create(1, 1)
@@ -152,7 +152,7 @@ Public Sub GivenTwoLeftAndSameY_IsAdjacentReturnsFalse()
     Assert.IsFalse sut.IsAdjacent(other)
 End Sub
 
-'@TestMethod
+'@TestMethod("GridCoord")
 Public Sub GivenOneRightAndSameY_IsAdjacentReturnsTrue()
     Dim other As IGridCoord
     Set other = GridCoord.Create(3, 1)
@@ -163,7 +163,7 @@ Public Sub GivenOneRightAndSameY_IsAdjacentReturnsTrue()
     Assert.IsTrue sut.IsAdjacent(other)
 End Sub
 
-'@TestMethod
+'@TestMethod("GridCoord")
 Public Sub GivenTwoRightAndSameY_IsAdjacentReturnsFalse()
     Dim other As IGridCoord
     Set other = GridCoord.Create(5, 1)
@@ -174,7 +174,7 @@ Public Sub GivenTwoRightAndSameY_IsAdjacentReturnsFalse()
     Assert.IsFalse sut.IsAdjacent(other)
 End Sub
 
-'@TestMethod
+'@TestMethod("GridCoord")
 Public Sub GivenOneDownAndSameX_IsAdjacentReturnsTrue()
     Dim other As IGridCoord
     Set other = GridCoord.Create(1, 2)
@@ -185,7 +185,7 @@ Public Sub GivenOneDownAndSameX_IsAdjacentReturnsTrue()
     Assert.IsTrue sut.IsAdjacent(other)
 End Sub
 
-'@TestMethod
+'@TestMethod("GridCoord")
 Public Sub GivenTwoDownAndSameX_IsAdjacentReturnsFalse()
     Dim other As IGridCoord
     Set other = GridCoord.Create(1, 3)
@@ -196,7 +196,7 @@ Public Sub GivenTwoDownAndSameX_IsAdjacentReturnsFalse()
     Assert.IsFalse sut.IsAdjacent(other)
 End Sub
 
-'@TestMethod
+'@TestMethod("GridCoord")
 Public Sub GivenOneUpAndSameX_IsAdjacentReturnsTrue()
     Dim other As IGridCoord
     Set other = GridCoord.Create(1, 1)
@@ -207,7 +207,7 @@ Public Sub GivenOneUpAndSameX_IsAdjacentReturnsTrue()
     Assert.IsTrue sut.IsAdjacent(other)
 End Sub
 
-'@TestMethod
+'@TestMethod("GridCoord")
 Public Sub GivenTwoUpAndSameX_IsAdjacentReturnsFalse()
     Dim other As IGridCoord
     Set other = GridCoord.Create(1, 1)
@@ -218,7 +218,7 @@ Public Sub GivenTwoUpAndSameX_IsAdjacentReturnsFalse()
     Assert.IsFalse sut.IsAdjacent(other)
 End Sub
 
-'@TestMethod
+'@TestMethod("GridCoord")
 Public Sub GivenInvalidString_FromStringThrows()
     Const ExpectedError As Long = 5
     On Error GoTo TestFail
